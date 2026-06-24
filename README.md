@@ -83,4 +83,6 @@ utility-platform/
 - `config.js` 內含 Supabase Anon Key，此 key 為公開讀寫權限，適合內部使用
 - 若需限制存取，可在 Supabase RLS 政策中加入 IP 白名單或改為需要 Auth
 - 資料儲存於 Supabase，關閉瀏覽器後資料不遺失
-- 
+
+
+  
