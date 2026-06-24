@@ -1,16 +1,16 @@
 // ============================================================
 // app.js — 蒙恩水電保險管理平台（Excel 版）
 // ============================================================
- 
+
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
- 
+
 const S = { sites: [], records: [], insurance: [] };
 const PALETTE = ['#1D9E75','#378ADD','#BA7517','#D4537E','#7F77DD','#D85A30','#3B6D11','#A32D2D'];
 let elecChart = null, waterChart = null;
- 
+
 // ── Supabase ─────────────────────────────────────────────────
- 
+
 async function loadAll() {
   setSyncStatus('busy');
   try {
@@ -22,11 +22,11 @@ async function loadAll() {
     if (sitesRes.error) throw sitesRes.error;
     if (recRes.error)   throw recRes.error;
     if (insRes.error)   throw insRes.error;
- 
+
     S.sites     = sitesRes.data.map(r => ({ id: r.id, name: r.name, cycle: r.cycle }));
     S.records   = recRes.data.map(r => ({ id: r.id, siteId: r.site_id, period: r.period, elec: +r.elec, water: +r.water }));
     S.insurance = insRes.data.map(r => ({ id: r.id, name: r.name, vendor: r.vendor, expiry: r.expiry, alertDays: r.alert_days, note: r.note }));
- 
+
     setSyncStatus('ok');
     syncSelects();
     renderDash();
@@ -36,7 +36,7 @@ async function loadAll() {
     showToast('資料載入失敗：' + err.message, 'error');
   }
 }
- 
+
 async function upsertRecord(siteId, period, elec, water) {
   const existing = S.records.find(r => r.siteId === siteId && r.period === period);
   if (existing) {
@@ -50,13 +50,13 @@ async function upsertRecord(siteId, period, elec, water) {
     S.records.push({ id: data.id, siteId, period, elec, water });
   }
 }
- 
+
 async function deleteRecord(id) {
   const { error } = await db.from('utility_records').delete().eq('id', id);
   if (error) throw error;
   S.records = S.records.filter(r => r.id !== id);
 }
- 
+
 async function insertInsurance(item) {
   const { data, error } = await db.from('insurance')
     .insert({ name: item.name, vendor: item.vendor, expiry: item.expiry, alert_days: item.alertDays, note: item.note })
@@ -64,33 +64,33 @@ async function insertInsurance(item) {
   if (error) throw error;
   S.insurance.push({ ...item, id: data.id });
 }
- 
+
 async function deleteInsurance(id) {
   const { error } = await db.from('insurance').delete().eq('id', id);
   if (error) throw error;
   S.insurance = S.insurance.filter(i => i.id !== id);
 }
- 
+
 async function insertSite(name, cycle) {
   const { data, error } = await db.from('sites').insert({ name, cycle }).select().single();
   if (error) throw error;
   S.sites.push({ id: data.id, name, cycle });
 }
- 
+
 async function deleteSite(id) {
   const { error } = await db.from('sites').delete().eq('id', id);
   if (error) throw error;
   S.sites   = S.sites.filter(s => s.id !== id);
   S.records = S.records.filter(r => r.siteId !== id);
 }
- 
+
 // ── Helpers ──────────────────────────────────────────────────
- 
+
 function getSite(id)   { return S.sites.find(s => s.id === id); }
 function siteRecs(id)  { return S.records.filter(r => r.siteId === id).sort((a, b) => a.period.localeCompare(b.period)); }
 function daysLeft(d)   { return Math.ceil((new Date(d) - new Date()) / 864e5); }
 function todayStr()    { return new Date().toISOString().slice(0, 10); }
- 
+
 function setSyncStatus(state) {
   const el  = document.getElementById('sync-status');
   const map = {
@@ -102,7 +102,7 @@ function setSyncStatus(state) {
   el.className = 'sync-badge ' + m.cls;
   el.innerHTML = `<i class="ti ${m.icon}"></i><span>${m.label}</span>`;
 }
- 
+
 function showToast(msg, type = 'success') {
   const t  = document.getElementById('toast');
   t.className = 'toast show ' + type;
@@ -111,7 +111,7 @@ function showToast(msg, type = 'success') {
   clearTimeout(t._timer);
   t._timer = setTimeout(() => t.classList.remove('show'), 3200);
 }
- 
+
 function syncSelects() {
   ['in-site', 'site-filter', 'hist-filter'].forEach(id => {
     const el = document.getElementById(id); if (!el) return;
@@ -121,16 +121,16 @@ function syncSelects() {
     if (v) el.value = v;
   });
 }
- 
+
 function updateIOCounts() {
   const eu = document.getElementById('export-util-count');
   const ei = document.getElementById('export-ins-count');
   if (eu) eu.textContent = `共 ${S.records.length} 筆紀錄`;
   if (ei) ei.textContent = `共 ${S.insurance.length} 筆保險`;
 }
- 
+
 // ── Tab 切換 ─────────────────────────────────────────────────
- 
+
 function goTab(name) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -142,9 +142,9 @@ function goTab(name) {
   if (name === 'sites')     renderSites();
   if (name === 'io')        updateIOCounts();
 }
- 
+
 // ── 儀表板 ───────────────────────────────────────────────────
- 
+
 const chartOpts = {
   responsive: true, maintainAspectRatio: false,
   plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 10, padding: 10, usePointStyle: true } } },
@@ -153,7 +153,7 @@ const chartOpts = {
     y: { ticks: { font: { size: 11 } }, grid: { color: 'rgba(128,128,128,.08)' } },
   },
 };
- 
+
 function renderDash() {
   syncSelects();
   const filter = document.getElementById('site-filter').value;
@@ -161,32 +161,32 @@ function renderDash() {
   const urgent  = S.insurance.filter(i => { const d = daysLeft(i.expiry); return d > 0 && d <= i.alertDays; });
   const expired = S.insurance.filter(i => daysLeft(i.expiry) <= 0);
   const totalAlerts = urgent.length + expired.length;
- 
+
   const badge = document.getElementById('top-badge');
   if (totalAlerts > 0) {
     badge.style.display = 'inline-flex';
     badge.className = 'pill danger';
     badge.innerHTML = `<i class="ti ti-bell" style="font-size:13px"></i>${totalAlerts} 項保險警示`;
   } else badge.style.display = 'none';
- 
+
   let alertHtml = '';
   expired.forEach(i => { alertHtml += `<div class="alert-item danger"><i class="ti ti-alert-circle"></i><span class="a-text">${i.name}（${i.vendor}）</span><span class="a-days">已到期</span></div>`; });
   urgent.forEach(i  => { alertHtml += `<div class="alert-item warning"><i class="ti ti-bell"></i><span class="a-text">${i.name}</span><span class="a-days">剩 ${daysLeft(i.expiry)} 天</span></div>`; });
   document.getElementById('alert-list').innerHTML = alertHtml;
- 
+
   let totalElec = 0, totalWater = 0;
   sites.forEach(s => {
     const r = siteRecs(s.id);
     if (r.length) { totalElec += r[r.length - 1].elec || 0; totalWater += r[r.length - 1].water || 0; }
   });
- 
+
   document.getElementById('metrics').innerHTML = `
     <div class="metric-card"><div class="metric-icon mi-teal"><i class="ti ti-building"></i></div><div class="metric-label">追蹤廠區</div><div class="metric-value">${sites.length}</div><div class="metric-delta">個廠區</div></div>
     <div class="metric-card"><div class="metric-icon mi-blue"><i class="ti ti-bolt"></i></div><div class="metric-label">最新總用電</div><div class="metric-value">${totalElec.toLocaleString()}</div><div class="metric-delta">度</div></div>
     <div class="metric-card"><div class="metric-icon mi-teal"><i class="ti ti-droplet"></i></div><div class="metric-label">最新總水費</div><div class="metric-value">$${totalWater.toLocaleString()}</div><div class="metric-delta">元</div></div>
     <div class="metric-card"><div class="metric-icon ${totalAlerts > 0 ? 'mi-amber' : 'mi-teal'}"><i class="ti ti-shield"></i></div><div class="metric-label">保險警示</div><div class="metric-value" style="color:${totalAlerts > 0 ? '#854F0B' : '#0F6E56'}">${totalAlerts}</div><div class="metric-delta">項</div></div>
   `;
- 
+
   const periods = [...new Set(S.records.map(r => r.period))].sort().slice(-8);
   const mkDs = key => sites.slice(0, 6).map((s, i) => ({
     label: s.name,
@@ -194,12 +194,12 @@ function renderDash() {
     borderColor: PALETTE[i % PALETTE.length], backgroundColor: PALETTE[i % PALETTE.length] + '18',
     tension: .35, spanGaps: true, pointRadius: 3, pointHoverRadius: 5, borderWidth: 2,
   }));
- 
+
   if (elecChart)  elecChart.destroy();
   if (waterChart) waterChart.destroy();
   elecChart  = new Chart(document.getElementById('c-elec'),  { type: 'line', data: { labels: periods, datasets: mkDs('elec') },  options: chartOpts });
   waterChart = new Chart(document.getElementById('c-water'), { type: 'line', data: { labels: periods, datasets: mkDs('water') }, options: chartOpts });
- 
+
   document.getElementById('dash-tbody').innerHTML = sites.map(s => {
     const r = siteRecs(s.id); const last = r[r.length - 1];
     return `<tr>
@@ -211,9 +211,9 @@ function renderDash() {
     </tr>`;
   }).join('');
 }
- 
+
 // ── 水電輸入 ─────────────────────────────────────────────────
- 
+
 async function addRecord() {
   const siteId = document.getElementById('in-site').value;
   const period = document.getElementById('in-period').value;
@@ -230,7 +230,7 @@ async function addRecord() {
   } catch (err) { setSyncStatus('err'); showToast('儲存失敗：' + err.message, 'error'); }
   finally { btn.disabled = false; }
 }
- 
+
 function renderHistory() {
   syncSelects();
   const f    = document.getElementById('hist-filter').value;
@@ -246,15 +246,15 @@ function renderHistory() {
       }).join('')
     : `<tr><td colspan="5"><div class="empty-state"><i class="ti ti-database-off"></i>尚無水電紀錄</div></td></tr>`;
 }
- 
+
 async function handleDelRecord(id) {
   setSyncStatus('busy');
   try { await deleteRecord(id); renderHistory(); setSyncStatus('ok'); showToast('紀錄已刪除'); }
   catch (err) { setSyncStatus('err'); showToast('刪除失敗：' + err.message, 'error'); }
 }
- 
+
 // ── 保險追蹤 ─────────────────────────────────────────────────
- 
+
 function renderIns() {
   const urgent  = S.insurance.filter(i => { const d = daysLeft(i.expiry); return d > 0 && d <= i.alertDays; });
   const expired = S.insurance.filter(i => daysLeft(i.expiry) <= 0);
@@ -262,7 +262,7 @@ function renderIns() {
   expired.forEach(i => { h += `<div class="alert-item danger"><i class="ti ti-alert-circle"></i><span class="a-text">${i.name}（${i.vendor}）</span><span class="a-days">已到期</span></div>`; });
   urgent.forEach(i  => { h += `<div class="alert-item warning"><i class="ti ti-bell"></i><span class="a-text">${i.name}</span><span class="a-days">剩 ${daysLeft(i.expiry)} 天</span></div>`; });
   document.getElementById('ins-alerts').innerHTML = h;
- 
+
   const sorted = [...S.insurance].sort((a, b) => a.expiry.localeCompare(b.expiry));
   document.getElementById('ins-tbody').innerHTML = sorted.map(i => {
     const d = daysLeft(i.expiry);
@@ -280,7 +280,7 @@ function renderIns() {
     </tr>`;
   }).join('');
 }
- 
+
 async function addIns() {
   const name      = document.getElementById('ins-name').value.trim();
   const vendor    = document.getElementById('ins-vendor').value.trim();
@@ -297,15 +297,15 @@ async function addIns() {
   } catch (err) { setSyncStatus('err'); showToast('新增失敗：' + err.message, 'error'); }
   finally { btn.disabled = false; }
 }
- 
+
 async function handleDelIns(id) {
   setSyncStatus('busy');
   try { await deleteInsurance(id); renderIns(); setSyncStatus('ok'); showToast('保險已刪除'); }
   catch (err) { setSyncStatus('err'); showToast('刪除失敗：' + err.message, 'error'); }
 }
- 
+
 // ── 廠區管理 ─────────────────────────────────────────────────
- 
+
 function renderSites() {
   document.getElementById('sites-tbody').innerHTML = S.sites.map(s => {
     const c = S.records.filter(r => r.siteId === s.id).length;
@@ -317,7 +317,7 @@ function renderSites() {
     </tr>`;
   }).join('');
 }
- 
+
 async function addSite() {
   const name  = document.getElementById('new-site-name').value.trim();
   const cycle = parseInt(document.getElementById('new-site-cycle').value);
@@ -332,7 +332,7 @@ async function addSite() {
   } catch (err) { setSyncStatus('err'); showToast('新增失敗：' + err.message, 'error'); }
   finally { btn.disabled = false; }
 }
- 
+
 async function handleDelSite(id) {
   const c = S.records.filter(r => r.siteId === id).length;
   if (c > 0 && !confirm(`此廠區有 ${c} 筆水電紀錄，刪除後無法復原，確定？`)) return;
@@ -340,9 +340,9 @@ async function handleDelSite(id) {
   try { await deleteSite(id); renderSites(); syncSelects(); setSyncStatus('ok'); showToast('廠區已刪除'); }
   catch (err) { setSyncStatus('err'); showToast('刪除失敗：' + err.message, 'error'); }
 }
- 
+
 // ── Excel 工具函式 ────────────────────────────────────────────
- 
+
 function dlXLSX(rows, sheetName, filename, colWidths) {
   const ws = XLSX.utils.aoa_to_sheet(rows);
   if (colWidths) ws['!cols'] = colWidths;
@@ -356,7 +356,7 @@ function dlXLSX(rows, sheetName, filename, colWidths) {
   XLSX.utils.book_append_sheet(wb, ws, sheetName);
   XLSX.writeFile(wb, filename);
 }
- 
+
 function readXLSX(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -372,9 +372,9 @@ function readXLSX(file) {
     reader.readAsArrayBuffer(file);
   });
 }
- 
+
 // ── 範本下載 ─────────────────────────────────────────────────
- 
+
 const TEMPLATES = {
   utility: {
     sheet: '水電紀錄',
@@ -409,15 +409,15 @@ const TEMPLATES = {
     ],
   },
 };
- 
+
 function dlTemplate(type) {
   const t = TEMPLATES[type];
   dlXLSX(t.rows, t.sheet, t.filename, t.cols);
   showToast(`${t.sheet}範本下載完成`);
 }
- 
+
 // ── Excel 匯入 ────────────────────────────────────────────────
- 
+
 async function handleFileImport(input) {
   const file = input.files[0]; if (!file) return;
   const type = document.getElementById('import-type').value;
@@ -425,7 +425,7 @@ async function handleFileImport(input) {
     const rows = await readXLSX(file);
     setSyncStatus('busy');
     let count = 0;
- 
+
     if (type === 'utility') {
       for (const r of rows) {
         const siteName = String(r['廠區名稱'] || '').trim();
@@ -459,7 +459,7 @@ async function handleFileImport(input) {
         count++;
       }
     }
- 
+
     input.value = '';
     syncSelects(); updateIOCounts(); setSyncStatus('ok');
     showToast(`成功匯入 ${count} 筆資料`);
@@ -469,9 +469,9 @@ async function handleFileImport(input) {
     showToast('匯入失敗：' + err.message, 'error');
   }
 }
- 
+
 // ── Excel / JSON 匯出 ─────────────────────────────────────────
- 
+
 function exportExcel(type) {
   if (type === 'utility') {
     const rows = [['廠區名稱', '期別', '用電度數(度)', '水費(元)']];
@@ -487,7 +487,7 @@ function exportExcel(type) {
   }
   showToast('Excel 匯出完成');
 }
- 
+
 function exportJSON() {
   const blob = new Blob([JSON.stringify(S, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
@@ -496,7 +496,7 @@ function exportJSON() {
   a.click(); URL.revokeObjectURL(a.href);
   showToast('完整備份匯出完成');
 }
- 
+
 async function handleJSONImport(input) {
   const file = input.files[0]; if (!file) return;
   const reader = new FileReader();
@@ -519,45 +519,45 @@ async function handleJSONImport(input) {
   };
   reader.readAsText(file, 'UTF-8');
 }
- 
+
 // ── 事件代理 ─────────────────────────────────────────────────
- 
+
 document.addEventListener('click', e => {
   const nb = e.target.closest('.nav-btn');
   if (nb) { goTab(nb.dataset.tab); return; }
- 
+
   const sb = e.target.closest('.seg-btn');
   if (sb) {
     document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
     sb.classList.add('active'); renderDash(); return;
   }
- 
+
   if (e.target.closest('#btn-add-record')) { addRecord(); return; }
   if (e.target.closest('#btn-add-ins'))    { addIns();    return; }
   if (e.target.closest('#btn-add-site'))   { addSite();   return; }
   if (e.target.closest('#btn-export-json')){ exportJSON(); return; }
- 
+
   const tplBtn = e.target.closest('[data-tpl]');
   if (tplBtn) { dlTemplate(tplBtn.dataset.tpl); return; }
- 
+
   const expBtn = e.target.closest('[data-export]');
   if (expBtn) { exportExcel(expBtn.dataset.export); return; }
- 
+
   const delRec  = e.target.closest('[data-delrec]');
   if (delRec)  { handleDelRecord(delRec.dataset.delrec);  return; }
- 
+
   const delIns  = e.target.closest('[data-delins]');
   if (delIns)  { handleDelIns(delIns.dataset.delins);    return; }
- 
+
   const delSite = e.target.closest('[data-delsite]');
   if (delSite) { handleDelSite(delSite.dataset.delsite); return; }
 });
- 
+
 document.getElementById('site-filter').addEventListener('change', renderDash);
 document.getElementById('hist-filter').addEventListener('change', renderHistory);
 document.getElementById('file-input').addEventListener('change', function () { handleFileImport(this); });
 document.getElementById('json-input').addEventListener('change', function () { handleJSONImport(this); });
- 
+
 // ── 初始化 ────────────────────────────────────────────────────
 const now = new Date();
 document.getElementById('in-period').value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
