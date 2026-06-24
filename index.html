@@ -8,9 +8,9 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
+ 
 <div id="app">
-
+ 
   <!-- 頂部 Header -->
   <header class="header">
     <div class="header-left">
@@ -27,7 +27,7 @@
       <div id="top-badge" style="display:none"></div>
     </div>
   </header>
-
+ 
   <!-- 頁籤導覽 -->
   <nav class="nav">
     <button class="nav-btn active" data-tab="dashboard"><i class="ti ti-layout-dashboard"></i>儀表板</button>
@@ -36,13 +36,13 @@
     <button class="nav-btn" data-tab="sites"><i class="ti ti-building"></i>廠區管理</button>
     <button class="nav-btn" data-tab="io"><i class="ti ti-database-import"></i>匯入 / 匯出</button>
   </nav>
-
+ 
   <!-- Toast 通知 -->
   <div id="toast" class="toast">
     <i class="ti ti-check" id="toast-icon"></i>
     <span id="toast-msg"></span>
   </div>
-
+ 
   <!-- ── 儀表板 ── -->
   <section id="tab-dashboard" class="tab active">
     <div class="controls-bar">
@@ -85,7 +85,7 @@
       </table>
     </div>
   </section>
-
+ 
   <!-- ── 輸入水電 ── -->
   <section id="tab-input" class="tab">
     <div class="form-panel">
@@ -117,7 +117,7 @@
       </table>
     </div>
   </section>
-
+ 
   <!-- ── 保險追蹤 ── -->
   <section id="tab-insurance" class="tab">
     <div id="ins-alerts" class="alert-list"></div>
@@ -148,7 +148,7 @@
       </table>
     </div>
   </section>
-
+ 
   <!-- ── 廠區管理 ── -->
   <section id="tab-sites" class="tab">
     <div class="form-panel">
@@ -178,41 +178,41 @@
       </table>
     </div>
   </section>
-
+ 
   <!-- ── 匯入 / 匯出 ── -->
   <section id="tab-io" class="tab">
     <div class="io-grid">
       <!-- 下載範本 -->
       <div class="io-card">
         <div class="io-card-title"><i class="ti ti-download" style="color:#185FA5"></i>下載匯入範本</div>
-        <div class="io-card-sub">提供同仁填寫用的 CSV 範本。</div>
+        <div class="io-card-sub">提供同仁填寫用的 Excel 範本（.xlsx），用 Excel 開啟填寫後上傳即可。</div>
         <div class="tpl-row">
           <div class="tpl-info">
             <div class="tpl-icon"><i class="ti ti-bolt"></i></div>
             <div><div class="tpl-name">水電紀錄範本</div><div class="tpl-desc">廠區、期別、用電、水費</div></div>
           </div>
-          <button class="btn blue" data-tpl="utility"><i class="ti ti-download"></i>下載</button>
+          <button class="btn blue" data-tpl="utility"><i class="ti ti-download"></i>下載 .xlsx</button>
         </div>
         <div class="tpl-row">
           <div class="tpl-info">
             <div class="tpl-icon"><i class="ti ti-shield"></i></div>
             <div><div class="tpl-name">保險清單範本</div><div class="tpl-desc">保險名稱、公司、到期日</div></div>
           </div>
-          <button class="btn blue" data-tpl="insurance"><i class="ti ti-download"></i>下載</button>
+          <button class="btn blue" data-tpl="insurance"><i class="ti ti-download"></i>下載 .xlsx</button>
         </div>
         <div class="tpl-row">
           <div class="tpl-info">
             <div class="tpl-icon"><i class="ti ti-building"></i></div>
             <div><div class="tpl-name">廠區設定範本</div><div class="tpl-desc">廠區名稱、計費週期</div></div>
           </div>
-          <button class="btn blue" data-tpl="sites"><i class="ti ti-download"></i>下載</button>
+          <button class="btn blue" data-tpl="sites"><i class="ti ti-download"></i>下載 .xlsx</button>
         </div>
       </div>
-
-      <!-- 匯入 CSV -->
+ 
+      <!-- 匯入 Excel -->
       <div class="io-card">
-        <div class="io-card-title"><i class="ti ti-upload" style="color:#0F6E56"></i>匯入 CSV 資料</div>
-        <div class="io-card-sub">選擇類型後上傳填寫好的 CSV 檔案。</div>
+        <div class="io-card-title"><i class="ti ti-upload" style="color:#0F6E56"></i>匯入 Excel 資料</div>
+        <div class="io-card-sub">選擇類型後上傳填寫好的 .xlsx 檔案，系統自動解析匯入。</div>
         <div class="fg" style="margin-bottom:10px">
           <label>資料類型</label>
           <select id="import-type" style="width:100%">
@@ -223,15 +223,15 @@
         </div>
         <label class="drop-zone" for="file-input">
           <i class="ti ti-file-upload"></i>
-          點擊或拖曳 CSV 檔案至此處
-          <div class="drop-hint">支援 .csv 格式，UTF-8 編碼</div>
-          <input type="file" id="file-input" accept=".csv">
+          點擊或拖曳 Excel 檔案至此處
+          <div class="drop-hint">支援 .xlsx 格式</div>
+          <input type="file" id="file-input" accept=".xlsx,.xls">
         </label>
       </div>
     </div>
-
+ 
     <div class="divider"></div>
-
+ 
     <div class="section-row">
       <span class="section-label" style="font-size:14px">匯出現有資料</span>
       <span style="font-size:12px;color:#888">將目前資料庫內容下載為 CSV</span>
@@ -240,12 +240,12 @@
       <div class="io-card sm-card">
         <div class="sm-card-title"><i class="ti ti-bolt" style="color:#185FA5"></i>水電紀錄</div>
         <div class="sm-card-count" id="export-util-count">—</div>
-        <button class="btn primary full" data-export="utility"><i class="ti ti-download"></i>匯出 CSV</button>
+        <button class="btn primary full" data-export="utility"><i class="ti ti-download"></i>匯出 Excel</button>
       </div>
       <div class="io-card sm-card">
         <div class="sm-card-title"><i class="ti ti-shield" style="color:#0F6E56"></i>保險清單</div>
         <div class="sm-card-count" id="export-ins-count">—</div>
-        <button class="btn primary full" data-export="insurance"><i class="ti ti-download"></i>匯出 CSV</button>
+        <button class="btn primary full" data-export="insurance"><i class="ti ti-download"></i>匯出 Excel</button>
       </div>
       <div class="io-card sm-card">
         <div class="sm-card-title"><i class="ti ti-database" style="color:#854F0B"></i>完整備份</div>
@@ -253,7 +253,7 @@
         <button class="btn amber full" id="btn-export-json"><i class="ti ti-download"></i>匯出 JSON</button>
       </div>
     </div>
-
+ 
     <div class="divider"></div>
     <div class="section-label" style="font-size:13px;margin-bottom:8px;display:flex;align-items:center;gap:6px">
       <i class="ti ti-upload" style="color:#854F0B"></i>還原完整備份
@@ -264,13 +264,15 @@
       <i class="ti ti-file-import"></i>點擊上傳 JSON 備份檔案
     </label>
   </section>
-
+ 
 </div><!-- /#app -->
-
+ 
 <!-- 載入順序：Supabase → Chart.js → app.js -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
+ 
