@@ -8,9 +8,9 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
- 
+
 <div id="app">
- 
+
   <!-- 頂部 Header -->
   <header class="header">
     <div class="header-left">
@@ -27,7 +27,7 @@
       <div id="top-badge" style="display:none"></div>
     </div>
   </header>
- 
+
   <!-- 頁籤導覽 -->
   <nav class="nav">
     <button class="nav-btn active" data-tab="dashboard"><i class="ti ti-layout-dashboard"></i>儀表板</button>
@@ -36,13 +36,13 @@
     <button class="nav-btn" data-tab="sites"><i class="ti ti-building"></i>廠區管理</button>
     <button class="nav-btn" data-tab="io"><i class="ti ti-database-import"></i>匯入 / 匯出</button>
   </nav>
- 
+
   <!-- Toast 通知 -->
   <div id="toast" class="toast">
     <i class="ti ti-check" id="toast-icon"></i>
     <span id="toast-msg"></span>
   </div>
- 
+
   <!-- ── 儀表板 ── -->
   <section id="tab-dashboard" class="tab active">
     <div class="controls-bar">
@@ -85,7 +85,7 @@
       </table>
     </div>
   </section>
- 
+
   <!-- ── 輸入水電 ── -->
   <section id="tab-input" class="tab">
     <div class="form-panel">
@@ -117,7 +117,7 @@
       </table>
     </div>
   </section>
- 
+
   <!-- ── 保險追蹤 ── -->
   <section id="tab-insurance" class="tab">
     <div id="ins-alerts" class="alert-list"></div>
@@ -148,7 +148,7 @@
       </table>
     </div>
   </section>
- 
+
   <!-- ── 廠區管理 ── -->
   <section id="tab-sites" class="tab">
     <div class="form-panel">
@@ -178,7 +178,7 @@
       </table>
     </div>
   </section>
- 
+
   <!-- ── 匯入 / 匯出 ── -->
   <section id="tab-io" class="tab">
     <div class="io-grid">
@@ -208,7 +208,7 @@
           <button class="btn blue" data-tpl="sites"><i class="ti ti-download"></i>下載 .xlsx</button>
         </div>
       </div>
- 
+
       <!-- 匯入 Excel -->
       <div class="io-card">
         <div class="io-card-title"><i class="ti ti-upload" style="color:#0F6E56"></i>匯入 Excel 資料</div>
@@ -229,9 +229,9 @@
         </label>
       </div>
     </div>
- 
+
     <div class="divider"></div>
- 
+
     <div class="section-row">
       <span class="section-label" style="font-size:14px">匯出現有資料</span>
       <span style="font-size:12px;color:#888">將目前資料庫內容下載為 CSV</span>
@@ -253,7 +253,7 @@
         <button class="btn amber full" id="btn-export-json"><i class="ti ti-download"></i>匯出 JSON</button>
       </div>
     </div>
- 
+
     <div class="divider"></div>
     <div class="section-label" style="font-size:13px;margin-bottom:8px;display:flex;align-items:center;gap:6px">
       <i class="ti ti-upload" style="color:#854F0B"></i>還原完整備份
@@ -264,9 +264,9 @@
       <i class="ti ti-file-import"></i>點擊上傳 JSON 備份檔案
     </label>
   </section>
- 
+
 </div><!-- /#app -->
- 
+
 <!-- 載入順序：Supabase → Chart.js → app.js -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -275,4 +275,3 @@
 <script src="app.js"></script>
 </body>
 </html>
- 
