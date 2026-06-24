@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>水電保險管理平台 — 蒙恩</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- 頂部 Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-icon"><i class="ti ti-building-factory"></i></div>
+      <div>
+        <div class="app-title">水電 &amp; 保險管理平台</div>
+        <div class="app-sub">蒙恩聽障烘焙坊股份有限公司</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div id="sync-status" class="sync-badge sync-ok">
+        <i class="ti ti-cloud-check"></i><span>已同步</span>
+      </div>
+      <div id="top-badge" style="display:none"></div>
+    </div>
+  </header>
+
+  <!-- 頁籤導覽 -->
+  <nav class="nav">
+    <button class="nav-btn active" data-tab="dashboard"><i class="ti ti-layout-dashboard"></i>儀表板</button>
+    <button class="nav-btn" data-tab="input"><i class="ti ti-edit"></i>輸入水電</button>
+    <button class="nav-btn" data-tab="insurance"><i class="ti ti-shield-check"></i>保險追蹤</button>
+    <button class="nav-btn" data-tab="sites"><i class="ti ti-building"></i>廠區管理</button>
+    <button class="nav-btn" data-tab="io"><i class="ti ti-database-import"></i>匯入 / 匯出</button>
+  </nav>
+
+  <!-- Toast 通知 -->
+  <div id="toast" class="toast">
+    <i class="ti ti-check" id="toast-icon"></i>
+    <span id="toast-msg"></span>
+  </div>
+
+  <!-- ── 儀表板 ── -->
+  <section id="tab-dashboard" class="tab active">
+    <div class="controls-bar">
+      <label>顯示週期</label>
+      <div class="seg">
+        <button class="seg-btn" data-period="1">單月</button>
+        <button class="seg-btn active" data-period="2">雙月</button>
+        <button class="seg-btn" data-period="3">季</button>
+      </div>
+      <select id="site-filter" class="sm">
+        <option value="all">所有廠區</option>
+      </select>
+    </div>
+    <div id="alert-list" class="alert-list"></div>
+    <div class="metric-row" id="metrics"></div>
+    <div class="charts-row">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="ti ti-bolt"></i>用電趨勢（度）</div>
+        </div>
+        <div class="chart-wrap"><canvas id="c-elec"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="ti ti-droplet"></i>水費趨勢（元）</div>
+        </div>
+        <div class="chart-wrap"><canvas id="c-water"></canvas></div>
+      </div>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead><tr>
+          <th style="width:30%">廠區</th>
+          <th style="width:18%">計費週期</th>
+          <th style="width:20%">最新用電</th>
+          <th style="width:20%">最新水費</th>
+          <th style="width:12%">期別</th>
+        </tr></thead>
+        <tbody id="dash-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── 輸入水電 ── -->
+  <section id="tab-input" class="tab">
+    <div class="form-panel">
+      <div class="form-panel-title"><i class="ti ti-plus"></i>新增水電紀錄</div>
+      <div class="form-grid">
+        <div class="fg"><label>廠區</label><select id="in-site"></select></div>
+        <div class="fg"><label>期別（年/月）</label><input type="month" id="in-period"></div>
+        <div class="fg"><label>用電度數（度）</label><input type="number" id="in-elec" placeholder="0" min="0"></div>
+        <div class="fg"><label>水費（元）</label><input type="number" id="in-water" placeholder="0" min="0"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" id="btn-add-record"><i class="ti ti-plus"></i>新增</button>
+      </div>
+    </div>
+    <div class="section-row">
+      <span class="section-label">歷史紀錄</span>
+      <select id="hist-filter" class="sm"><option value="all">所有廠區</option></select>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead><tr>
+          <th style="width:28%">廠區</th>
+          <th style="width:22%">期別</th>
+          <th style="width:20%">用電（度）</th>
+          <th style="width:20%">水費（元）</th>
+          <th style="width:10%"></th>
+        </tr></thead>
+        <tbody id="hist-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── 保險追蹤 ── -->
+  <section id="tab-insurance" class="tab">
+    <div id="ins-alerts" class="alert-list"></div>
+    <div class="form-panel">
+      <div class="form-panel-title"><i class="ti ti-plus"></i>新增保險</div>
+      <div class="form-grid">
+        <div class="fg fg-2"><label>保險名稱</label><input type="text" id="ins-name" placeholder="例：火災險－北屯總部"></div>
+        <div class="fg"><label>保險公司</label><input type="text" id="ins-vendor" placeholder="例：新光產物"></div>
+        <div class="fg"><label>到期日</label><input type="date" id="ins-expiry"></div>
+        <div class="fg"><label>預警天數</label><input type="number" id="ins-days" value="30" min="1"></div>
+        <div class="fg"><label>備註</label><input type="text" id="ins-note" placeholder="選填"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" id="btn-add-ins"><i class="ti ti-plus"></i>新增保險</button>
+      </div>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead><tr>
+          <th style="width:30%">保險項目</th>
+          <th style="width:18%">保險公司</th>
+          <th style="width:14%">到期日</th>
+          <th style="width:14%">剩餘天數</th>
+          <th style="width:14%">備註</th>
+          <th style="width:10%"></th>
+        </tr></thead>
+        <tbody id="ins-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── 廠區管理 ── -->
+  <section id="tab-sites" class="tab">
+    <div class="form-panel">
+      <div class="form-panel-title"><i class="ti ti-plus"></i>新增廠區</div>
+      <div class="form-grid">
+        <div class="fg"><label>廠區名稱</label><input type="text" id="new-site-name" placeholder="例：新竹廠"></div>
+        <div class="fg"><label>計費週期</label>
+          <select id="new-site-cycle">
+            <option value="1">每月一期</option>
+            <option value="2">兩個月一期</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" id="btn-add-site"><i class="ti ti-plus"></i>新增廠區</button>
+      </div>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead><tr>
+          <th style="width:45%">廠區名稱</th>
+          <th style="width:30%">計費週期</th>
+          <th style="width:15%">資料筆數</th>
+          <th style="width:10%"></th>
+        </tr></thead>
+        <tbody id="sites-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── 匯入 / 匯出 ── -->
+  <section id="tab-io" class="tab">
+    <div class="io-grid">
+      <!-- 下載範本 -->
+      <div class="io-card">
+        <div class="io-card-title"><i class="ti ti-download" style="color:#185FA5"></i>下載匯入範本</div>
+        <div class="io-card-sub">提供同仁填寫用的 CSV 範本。</div>
+        <div class="tpl-row">
+          <div class="tpl-info">
+            <div class="tpl-icon"><i class="ti ti-bolt"></i></div>
+            <div><div class="tpl-name">水電紀錄範本</div><div class="tpl-desc">廠區、期別、用電、水費</div></div>
+          </div>
+          <button class="btn blue" data-tpl="utility"><i class="ti ti-download"></i>下載</button>
+        </div>
+        <div class="tpl-row">
+          <div class="tpl-info">
+            <div class="tpl-icon"><i class="ti ti-shield"></i></div>
+            <div><div class="tpl-name">保險清單範本</div><div class="tpl-desc">保險名稱、公司、到期日</div></div>
+          </div>
+          <button class="btn blue" data-tpl="insurance"><i class="ti ti-download"></i>下載</button>
+        </div>
+        <div class="tpl-row">
+          <div class="tpl-info">
+            <div class="tpl-icon"><i class="ti ti-building"></i></div>
+            <div><div class="tpl-name">廠區設定範本</div><div class="tpl-desc">廠區名稱、計費週期</div></div>
+          </div>
+          <button class="btn blue" data-tpl="sites"><i class="ti ti-download"></i>下載</button>
+        </div>
+      </div>
+
+      <!-- 匯入 CSV -->
+      <div class="io-card">
+        <div class="io-card-title"><i class="ti ti-upload" style="color:#0F6E56"></i>匯入 CSV 資料</div>
+        <div class="io-card-sub">選擇類型後上傳填寫好的 CSV 檔案。</div>
+        <div class="fg" style="margin-bottom:10px">
+          <label>資料類型</label>
+          <select id="import-type" style="width:100%">
+            <option value="utility">水電紀錄</option>
+            <option value="insurance">保險清單</option>
+            <option value="sites">廠區設定</option>
+          </select>
+        </div>
+        <label class="drop-zone" for="file-input">
+          <i class="ti ti-file-upload"></i>
+          點擊或拖曳 CSV 檔案至此處
+          <div class="drop-hint">支援 .csv 格式，UTF-8 編碼</div>
+          <input type="file" id="file-input" accept=".csv">
+        </label>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-row">
+      <span class="section-label" style="font-size:14px">匯出現有資料</span>
+      <span style="font-size:12px;color:#888">將目前資料庫內容下載為 CSV</span>
+    </div>
+    <div class="export-grid">
+      <div class="io-card sm-card">
+        <div class="sm-card-title"><i class="ti ti-bolt" style="color:#185FA5"></i>水電紀錄</div>
+        <div class="sm-card-count" id="export-util-count">—</div>
+        <button class="btn primary full" data-export="utility"><i class="ti ti-download"></i>匯出 CSV</button>
+      </div>
+      <div class="io-card sm-card">
+        <div class="sm-card-title"><i class="ti ti-shield" style="color:#0F6E56"></i>保險清單</div>
+        <div class="sm-card-count" id="export-ins-count">—</div>
+        <button class="btn primary full" data-export="insurance"><i class="ti ti-download"></i>匯出 CSV</button>
+      </div>
+      <div class="io-card sm-card">
+        <div class="sm-card-title"><i class="ti ti-database" style="color:#854F0B"></i>完整備份</div>
+        <div class="sm-card-count">所有資料（JSON）</div>
+        <button class="btn amber full" id="btn-export-json"><i class="ti ti-download"></i>匯出 JSON</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-label" style="font-size:13px;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+      <i class="ti ti-upload" style="color:#854F0B"></i>還原完整備份
+    </div>
+    <div style="font-size:12px;color:#888;margin-bottom:10px">匯入先前匯出的 JSON 備份，將完整覆蓋現有資料庫資料。</div>
+    <label class="drop-zone sm-drop" for="json-input">
+      <input type="file" id="json-input" accept=".json">
+      <i class="ti ti-file-import"></i>點擊上傳 JSON 備份檔案
+    </label>
+  </section>
+
+</div><!-- /#app -->
+
+<!-- 載入順序：Supabase → Chart.js → app.js -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
