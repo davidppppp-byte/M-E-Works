@@ -4,8 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>水電保險管理平台 — 蒙恩</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 <div id="app">
@@ -34,21 +37,35 @@
 
   <div id="toast" class="toast"><i class="ti ti-check" id="toast-icon"></i><span id="toast-msg"></span></div>
 
+  <!-- 未填提醒浮窗 -->
+  <div class="unfilled-float" id="unfilled-float" style="display:none">
+    <div class="unfilled-header" onclick="toggleUnfilled()">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="unfilled-dot" id="unfilled-dot"></div>
+        <span id="unfilled-title">本期待填項目</span>
+      </div>
+      <i class="ti ti-chevron-down" id="unfilled-chevron" style="font-size:14px;color:var(--text-3)"></i>
+    </div>
+    <div class="unfilled-list" id="unfilled-list"></div>
+  </div>
+
   <!-- ── 儀表板 ── -->
   <section id="tab-dashboard" class="tab active">
     <div class="controls-bar">
       <label>篩選廠區</label>
       <select id="site-filter" class="sm"><option value="all">所有廠區</option></select>
+      <label style="margin-left:8px">異常閾值</label>
+      <select id="anomaly-threshold" class="sm" onchange="renderDash()">
+        <option value="20">±20%</option>
+        <option value="30">±30%</option>
+        <option value="50">±50%</option>
+      </select>
     </div>
     <div id="alert-list" class="alert-list"></div>
     <div class="metric-row" id="metrics"></div>
-
-    <!-- 廠區卡片 -->
-    <div class="section-label" style="margin-bottom:.75rem;font-size:13px;font-weight:500;color:#555">各廠區最新數值</div>
+    <div class="section-label" style="margin-bottom:.875rem">各廠區最新數值</div>
     <div id="location-cards" class="location-cards"></div>
-
-    <!-- 趨勢圖 -->
-    <div class="charts-row" style="margin-top:1.25rem">
+    <div class="charts-row" style="margin-top:1.5rem">
       <div class="card">
         <div class="card-header"><div class="card-title"><i class="ti ti-bolt"></i>用電趨勢（雙月，度）</div></div>
         <div class="chart-wrap"><canvas id="c-elec"></canvas></div>
@@ -64,29 +81,22 @@
   <section id="tab-input" class="tab">
     <div class="form-panel">
       <div class="form-panel-title"><i class="ti ti-plus"></i>新增水電紀錄</div>
-
-      <!-- 水/電切換 -->
-      <div class="type-toggle" style="margin-bottom:14px">
+      <div class="type-toggle" style="margin-bottom:16px">
         <button id="input-type-water" class="type-toggle-btn water active"><i class="ti ti-droplet"></i>水費</button>
         <button id="input-type-elec"  class="type-toggle-btn elec"><i class="ti ti-bolt"></i>電費</button>
       </div>
-
       <div class="form-grid">
         <div class="fg"><label>計費項目</label><select id="in-site"></select></div>
         <div class="fg"><label>期別（年/月）</label><input type="month" id="in-period"></div>
         <div class="fg" id="input-water-row"><label>水費（元）</label><input type="number" id="in-water" placeholder="0" min="0"></div>
-        <div class="fg" id="input-elec-row"  style="display:none"><label>用電度數（度）</label><input type="number" id="in-elec" placeholder="0" min="0" value="0"></div>
+        <div class="fg" id="input-elec-row" style="display:none"><label>用電度數（度）</label><input type="number" id="in-elec" placeholder="0" min="0" value="0"></div>
       </div>
-      <div class="btn-row">
-        <button class="btn primary" id="btn-add-record"><i class="ti ti-plus"></i>新增</button>
-      </div>
+      <div class="btn-row"><button class="btn primary" id="btn-add-record"><i class="ti ti-plus"></i>新增</button></div>
     </div>
-
-    <!-- 歷史紀錄 -->
     <div class="section-row">
       <span class="section-label">歷史紀錄</span>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-        <input type="text" id="hist-search" placeholder="搜尋名稱或期別…" style="font-size:12px;padding:5px 10px;width:160px">
+        <input type="text" id="hist-search" placeholder="搜尋名稱或期別…" style="font-size:12px;padding:6px 10px;width:160px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text);outline:none">
         <select id="hist-filter" class="sm"><option value="all">所有計費項目</option></select>
       </div>
     </div>
@@ -128,22 +138,10 @@
     <div class="form-panel">
       <div class="form-panel-title"><i class="ti ti-plus"></i>新增計費項目</div>
       <div class="form-grid">
-        <div class="fg">
-          <label>類型</label>
-          <select id="new-site-type">
-            <option value="water">【水】水費</option>
-            <option value="elec">【電】電費</option>
-          </select>
-        </div>
+        <div class="fg"><label>類型</label><select id="new-site-type"><option value="water">【水】水費</option><option value="elec">【電】電費</option></select></div>
         <div class="fg"><label>廠區名稱</label><input type="text" id="new-site-loc" placeholder="例：北屯總部"></div>
         <div class="fg"><label>編號或說明（選填）</label><input type="text" id="new-site-label" placeholder="例：K、1F、010"></div>
-        <div class="fg">
-          <label>計費週期</label>
-          <select id="new-site-cycle">
-            <option value="2">兩個月一期</option>
-            <option value="1">每月一期</option>
-          </select>
-        </div>
+        <div class="fg"><label>計費週期</label><select id="new-site-cycle"><option value="2">兩個月一期</option><option value="1">每月一期</option></select></div>
       </div>
       <div class="btn-row"><button class="btn primary" id="btn-add-site"><i class="ti ti-plus"></i>新增</button></div>
     </div>
@@ -159,7 +157,7 @@
   <section id="tab-io" class="tab">
     <div class="io-grid">
       <div class="io-card">
-        <div class="io-card-title"><i class="ti ti-download" style="color:#185FA5"></i>下載匯入範本</div>
+        <div class="io-card-title"><i class="ti ti-download" style="color:var(--blue)"></i>下載匯入範本</div>
         <div class="io-card-sub">同仁填寫後上傳匯入。</div>
         <div class="tpl-row">
           <div class="tpl-info"><div class="tpl-icon"><i class="ti ti-bolt"></i></div><div><div class="tpl-name">水電紀錄範本</div><div class="tpl-desc">計費項目、期別、數值</div></div></div>
@@ -175,48 +173,26 @@
         </div>
       </div>
       <div class="io-card">
-        <div class="io-card-title"><i class="ti ti-upload" style="color:#0F6E56"></i>匯入 Excel 資料</div>
+        <div class="io-card-title"><i class="ti ti-upload" style="color:var(--teal)"></i>匯入 Excel 資料</div>
         <div class="io-card-sub">選擇類型後上傳 .xlsx 檔案。</div>
-        <div class="fg" style="margin-bottom:10px">
-          <label>資料類型</label>
-          <select id="import-type" style="width:100%">
-            <option value="utility">水電紀錄</option>
-            <option value="insurance">保險清單</option>
-            <option value="sites">計費項目</option>
-          </select>
-        </div>
+        <div class="fg" style="margin-bottom:10px"><label>資料類型</label><select id="import-type" style="width:100%"><option value="utility">水電紀錄</option><option value="insurance">保險清單</option><option value="sites">計費項目</option></select></div>
         <label class="drop-zone" for="file-input">
-          <i class="ti ti-file-upload"></i>
-          點擊或拖曳 Excel 檔案至此處
+          <i class="ti ti-file-upload"></i>點擊或拖曳 Excel 檔案至此處
           <div class="drop-hint">支援 .xlsx 格式</div>
           <input type="file" id="file-input" accept=".xlsx,.xls">
         </label>
       </div>
     </div>
-
     <div class="divider"></div>
-    <div class="section-row"><span class="section-label" style="font-size:14px">匯出現有資料</span><span style="font-size:12px;color:#888">下載資料庫內容</span></div>
+    <div class="section-row"><span class="section-label">匯出現有資料</span><span style="font-size:12px;color:var(--text-3)">下載資料庫內容</span></div>
     <div class="export-grid">
-      <div class="io-card sm-card">
-        <div class="sm-card-title"><i class="ti ti-bolt" style="color:#185FA5"></i>水電紀錄</div>
-        <div class="sm-card-count" id="export-util-count">—</div>
-        <button class="btn primary full" data-export="utility"><i class="ti ti-download"></i>匯出 Excel</button>
-      </div>
-      <div class="io-card sm-card">
-        <div class="sm-card-title"><i class="ti ti-shield" style="color:#0F6E56"></i>保險清單</div>
-        <div class="sm-card-count" id="export-ins-count">—</div>
-        <button class="btn primary full" data-export="insurance"><i class="ti ti-download"></i>匯出 Excel</button>
-      </div>
-      <div class="io-card sm-card">
-        <div class="sm-card-title"><i class="ti ti-database" style="color:#854F0B"></i>完整備份</div>
-        <div class="sm-card-count">所有資料（JSON）</div>
-        <button class="btn amber full" id="btn-export-json"><i class="ti ti-download"></i>匯出 JSON</button>
-      </div>
+      <div class="io-card sm-card"><div class="sm-card-title"><i class="ti ti-bolt" style="color:var(--blue)"></i>水電紀錄</div><div class="sm-card-count" id="export-util-count">—</div><button class="btn primary full" data-export="utility"><i class="ti ti-download"></i>匯出 Excel</button></div>
+      <div class="io-card sm-card"><div class="sm-card-title"><i class="ti ti-shield" style="color:var(--teal)"></i>保險清單</div><div class="sm-card-count" id="export-ins-count">—</div><button class="btn primary full" data-export="insurance"><i class="ti ti-download"></i>匯出 Excel</button></div>
+      <div class="io-card sm-card"><div class="sm-card-title"><i class="ti ti-database" style="color:var(--amber)"></i>完整備份</div><div class="sm-card-count">所有資料（JSON）</div><button class="btn amber full" id="btn-export-json"><i class="ti ti-download"></i>匯出 JSON</button></div>
     </div>
-
     <div class="divider"></div>
-    <div class="section-label" style="font-size:13px;margin-bottom:8px;display:flex;align-items:center;gap:6px"><i class="ti ti-upload" style="color:#854F0B"></i>還原完整備份</div>
-    <div style="font-size:12px;color:#888;margin-bottom:10px">匯入 JSON 備份，將完整覆蓋現有資料庫資料。</div>
+    <div class="section-label" style="margin-bottom:8px;display:flex;align-items:center;gap:6px"><i class="ti ti-upload" style="color:var(--amber)"></i>還原完整備份</div>
+    <div style="font-size:12px;color:var(--text-2);margin-bottom:10px">匯入 JSON 備份，將完整覆蓋現有資料庫資料。</div>
     <label class="drop-zone sm-drop" for="json-input">
       <input type="file" id="json-input" accept=".json">
       <i class="ti ti-file-import"></i>點擊上傳 JSON 備份檔案
@@ -227,7 +203,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="config.js?v=3"></script>
-<script src="app.js?v=3"></script>
+<script src="config.js?v=4"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>
