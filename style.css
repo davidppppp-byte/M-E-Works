@@ -1,273 +1,578 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#F3F0E8" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0F0F0D" media="(prefers-color-scheme: dark)">
-<title>水電保險管理平台 — 蒙恩</title>
-<script>
-  // 先套用主題，避免閃爍
-  try { const t = localStorage.getItem('mn-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
-</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="style.css?v=5">
-</head>
-<body>
-<a class="skip-link" href="#main">跳至主要內容</a>
+/* ============================================================
+   蒙恩水電保險管理平台 v4 — style.css
+   設計語言：Editorial ledger — 暖紙底、墨黑字、鈷藍(水)×鈉黃(電)
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<div class="shell">
+:root {
+  color-scheme: light;
+  --bg:        #F3F0E8;
+  --bg-2:      #ECE8DD;
+  --surface:   #FBFAF6;
+  --surface-2: #F5F2EA;
+  --line:      rgba(28, 26, 20, .09);
+  --line-2:    rgba(28, 26, 20, .16);
+  --ink:       #17160F;
+  --ink-2:     #5D594D;
+  --ink-3:     #9A9485;
+  --on-ink:    #FBFAF6;
 
-  <!-- ── 側欄（桌機）／頂欄＋底部導覽（行動） ── -->
-  <aside class="rail">
-    <div class="brand">
-      <div class="brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 40 40"><path class="bm-water" d="M20 6c-5 7-9 11.6-9 17a9 9 0 0 0 9 9z"/><path class="bm-elec" d="M20 6v26a9 9 0 0 0 9-9c0-5.4-4-10-9-17z"/><path class="bm-bolt" d="M21.5 14 16 23h4.5l-1.5 6 5.5-9H20z"/></svg>
-      </div>
-      <div class="brand-text">
-        <strong>蒙恩</strong>
-        <span>水電 &amp; 保險管理</span>
-      </div>
-    </div>
+  --water:      #2448D8;
+  --water-ink:  #1D3BB3;
+  --water-soft: #E3E8FB;
+  --elec:       #E9A20E;
+  --elec-ink:   #8F5B00;
+  --elec-soft:  #FBEFD2;
+  --red:        #C2361F;
+  --red-soft:   #F8E1DA;
+  --green:      #2F7A4B;
+  --green-soft: #DFEFE3;
 
-    <nav class="nav" aria-label="主選單">
-      <button class="nav-btn active" data-tab="dashboard" aria-current="page"><span class="nav-idx">01</span><i class="ti ti-layout-dashboard"></i><span class="nav-label">儀表板</span><kbd>1</kbd></button>
-      <button class="nav-btn" data-tab="input"><span class="nav-idx">02</span><i class="ti ti-pencil-plus"></i><span class="nav-label">輸入水電</span><kbd>2</kbd></button>
-      <button class="nav-btn" data-tab="insurance"><span class="nav-idx">03</span><i class="ti ti-shield-check"></i><span class="nav-label">保險追蹤</span><kbd>3</kbd></button>
-      <button class="nav-btn" data-tab="sites"><span class="nav-idx">04</span><i class="ti ti-building-factory-2"></i><span class="nav-label">廠區管理</span><kbd>4</kbd></button>
-      <button class="nav-btn" data-tab="io"><span class="nav-idx">05</span><i class="ti ti-arrows-transfer-down"></i><span class="nav-label">匯入匯出</span><kbd>5</kbd></button>
-    </nav>
+  --shadow-1: 0 1px 0 rgba(28,26,20,.04), 0 1px 2px rgba(28,26,20,.05);
+  --shadow-2: 0 1px 0 rgba(28,26,20,.04), 0 12px 32px -12px rgba(28,26,20,.18);
+  --ring: 0 0 0 3px color-mix(in srgb, var(--water) 22%, transparent);
 
-    <div class="rail-foot">
-      <div id="sync-status" class="sync-badge sync-ok" role="status" aria-live="polite"><i class="ti ti-cloud-check"></i><span>已同步</span></div>
-      <button class="theme-btn" id="theme-btn" aria-label="切換深淺色"><i class="ti ti-sun-moon"></i></button>
-    </div>
-    <div class="rail-org">蒙恩聽障烘焙坊<br>股份有限公司</div>
-  </aside>
+  --r-sm: 8px; --r: 12px; --r-lg: 18px; --r-xl: 24px;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --ease-spring: cubic-bezier(.34, 1.4, .5, 1);
 
-  <main class="main" id="main">
-    <header class="topbar">
-      <div class="topbar-title">
-        <div class="eyebrow"><span id="page-idx">01</span><span class="eyebrow-rule"></span><span id="page-en">Overview</span></div>
-        <h1 class="page-title" id="page-title">儀表板</h1>
-      </div>
-      <div class="topbar-right">
-        <div id="top-badge" style="display:none"></div>
-        <div class="today" id="today"></div>
-      </div>
-    </header>
+  --f-sans: 'Inter Tight', 'Noto Sans TC', -apple-system, 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  --f-serif: 'Instrument Serif', 'Noto Serif TC', 'Songti TC', serif;
+  --f-cjk-serif: 'Noto Serif TC', 'Songti TC', serif;
+  --f-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
 
-    <div id="toast" class="toast" role="status" aria-live="polite"><i class="ti ti-check" id="toast-icon"></i><span id="toast-msg"></span></div>
+  --rail-w: 248px;
+  --gutter: clamp(16px, 3.2vw, 48px);
+}
 
-    <!-- ══════════ 儀表板 ══════════ -->
-    <section id="tab-dashboard" class="tab active">
-      <div class="dash-intro">
-        <p class="lede" id="dash-lede">正在讀取資料…</p>
-        <div class="controls">
-          <label class="ctl">
-            <span>廠區</span>
-            <select id="site-filter"><option value="all">所有廠區</option></select>
-            <i class="ti ti-chevron-down"></i>
-          </label>
-          <label class="ctl">
-            <span>異常閾值</span>
-            <select id="anomaly-threshold">
-              <option value="20">±20%</option>
-              <option value="30">±30%</option>
-              <option value="50">±50%</option>
-            </select>
-            <i class="ti ti-chevron-down"></i>
-          </label>
-        </div>
-      </div>
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0F0F0D; --bg-2: #161613; --surface: #181815; --surface-2: #1F1F1B;
+    --line: rgba(240,236,224,.08); --line-2: rgba(240,236,224,.15);
+    --ink: #F0ECE0; --ink-2: #A9A496; --ink-3: #6E6A5F; --on-ink: #0F0F0D;
+    --water: #6F8BFF; --water-ink: #9DB0FF; --water-soft: rgba(111,139,255,.13);
+    --elec: #F5B935; --elec-ink: #F5C55A; --elec-soft: rgba(245,185,53,.12);
+    --red: #FF7A5C; --red-soft: rgba(255,122,92,.12);
+    --green: #6BCB8B; --green-soft: rgba(107,203,139,.12);
+    --shadow-1: 0 0 0 1px rgba(0,0,0,.2);
+    --shadow-2: 0 18px 40px -16px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0F0F0D; --bg-2: #161613; --surface: #181815; --surface-2: #1F1F1B;
+  --line: rgba(240,236,224,.08); --line-2: rgba(240,236,224,.15);
+  --ink: #F0ECE0; --ink-2: #A9A496; --ink-3: #6E6A5F; --on-ink: #0F0F0D;
+  --water: #6F8BFF; --water-ink: #9DB0FF; --water-soft: rgba(111,139,255,.13);
+  --elec: #F5B935; --elec-ink: #F5C55A; --elec-soft: rgba(245,185,53,.12);
+  --red: #FF7A5C; --red-soft: rgba(255,122,92,.12);
+  --green: #6BCB8B; --green-soft: rgba(107,203,139,.12);
+  --shadow-1: 0 0 0 1px rgba(0,0,0,.2);
+  --shadow-2: 0 18px 40px -16px rgba(0,0,0,.7);
+}
 
-      <div id="alert-list" class="alert-list"></div>
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: var(--f-sans); font-size: 14px; line-height: 1.6;
+  background: var(--bg); color: var(--ink);
+  min-height: 100vh; min-height: 100dvh;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  font-feature-settings: 'ss01', 'cv11';
+}
+/* 紙張顆粒 */
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .35;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+::selection { background: var(--elec); color: #17160F; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid var(--water); outline-offset: 2px; border-radius: 6px; }
+.skip-link { position: absolute; left: -999px; top: 8px; z-index: 1000; background: var(--ink); color: var(--on-ink); padding: 8px 14px; border-radius: 8px; }
+.skip-link:focus { left: 8px; }
+kbd { font-family: var(--f-mono); font-size: 10px; }
+code { font-family: var(--f-mono); font-size: .9em; background: var(--surface-2); padding: 1px 6px; border-radius: 5px; border: 1px solid var(--line); }
 
-      <div class="kpi-grid" id="metrics">
-        <div class="kpi skeleton"></div><div class="kpi skeleton"></div><div class="kpi skeleton"></div><div class="kpi skeleton"></div>
-      </div>
+/* ── Shell ─────────────────────────────────────────────── */
+.shell { position: relative; z-index: 1; display: grid; grid-template-columns: var(--rail-w) minmax(0, 1fr); min-height: 100vh; }
 
-      <div class="section-head">
-        <h2><span class="sh-num">A</span>各廠區最新數值</h2>
-        <div class="legend-inline"><span class="lg water">水費</span><span class="lg elec">用電</span><span class="lg anomaly">超出閾值</span></div>
-      </div>
-      <div id="location-cards" class="loc-grid"></div>
+/* ── Rail ─────────────────────────────────────────────── */
+.rail {
+  position: sticky; top: 0; height: 100vh; height: 100dvh;
+  display: flex; flex-direction: column; gap: 28px;
+  padding: 28px 18px 22px; border-right: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg-2) 55%, transparent);
+}
+.brand { display: flex; align-items: center; gap: 12px; padding: 0 8px; }
+.brand-mark { width: 40px; height: 40px; flex-shrink: 0; transition: transform .6s var(--ease-spring); }
+.brand:hover .brand-mark { transform: rotate(-8deg) scale(1.05); }
+.brand-mark svg { width: 100%; height: 100%; display: block; }
+.bm-water { fill: var(--water); } .bm-elec { fill: var(--elec); } .bm-bolt { fill: var(--surface); }
+.brand-text { display: flex; flex-direction: column; line-height: 1.15; }
+.brand-text strong { font-family: var(--f-cjk-serif); font-size: 19px; letter-spacing: .08em; }
+.brand-text span { font-size: 11.5px; color: var(--ink-2); margin-top: 3px; letter-spacing: .04em; }
 
-      <div class="section-head">
-        <h2><span class="sh-num">B</span>雙月趨勢</h2>
-        <span class="section-note">每點為兩個月合計 · 最多顯示 8 項</span>
-      </div>
-      <div class="charts-row">
-        <article class="card chart-card elec">
-          <header class="card-head"><span class="card-kicker"><i class="ti ti-bolt"></i>Electricity</span><h3>用電趨勢 <small>度</small></h3></header>
-          <div class="chart-wrap"><canvas id="c-elec" aria-label="用電趨勢圖" role="img"></canvas></div>
-        </article>
-        <article class="card chart-card water">
-          <header class="card-head"><span class="card-kicker"><i class="ti ti-droplet"></i>Water</span><h3>水費趨勢 <small>元</small></h3></header>
-          <div class="chart-wrap"><canvas id="c-water" aria-label="水費趨勢圖" role="img"></canvas></div>
-        </article>
-      </div>
-    </section>
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav-btn {
+  position: relative; display: grid; grid-template-columns: 22px 20px 1fr auto; align-items: center; gap: 10px;
+  padding: 10px 10px 10px 8px; border: 0; border-radius: var(--r); background: transparent;
+  color: var(--ink-2); cursor: pointer; text-align: left; font-size: 14px; font-weight: 500;
+  transition: background .25s var(--ease), color .25s var(--ease);
+}
+.nav-idx { font-family: var(--f-mono); font-size: 10.5px; color: var(--ink-3); transition: color .25s; }
+.nav-btn i { font-size: 18px; transition: transform .35s var(--ease-spring); }
+.nav-btn kbd { opacity: 0; color: var(--ink-3); border: 1px solid var(--line-2); border-radius: 4px; padding: 0 5px; line-height: 16px; transition: opacity .2s; }
+.nav-btn:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 4%, transparent); }
+.nav-btn:hover i { transform: translateX(2px); }
+.nav-btn:hover kbd { opacity: 1; }
+.nav-btn.active { background: var(--ink); color: var(--on-ink); }
+.nav-btn.active .nav-idx { color: var(--elec); }
+.nav-btn.active kbd { opacity: .5; color: var(--on-ink); border-color: currentColor; }
+.nav-btn:active { transform: scale(.98); }
 
-    <!-- ══════════ 輸入水電 ══════════ -->
-    <section id="tab-input" class="tab">
-      <div class="split">
-        <div class="panel form-card sticky">
-          <h3 class="panel-title">新增水電紀錄</h3>
-          <p class="panel-sub">同一項目、同一期別再次送出會覆寫原紀錄。</p>
+.rail-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 4px; }
+.rail-org { font-size: 11px; color: var(--ink-3); line-height: 1.5; padding: 0 8px; letter-spacing: .03em; }
 
-          <div class="seg" id="seg" data-mode="water" role="tablist" aria-label="紀錄類型">
-            <span class="seg-ind" aria-hidden="true"></span>
-            <button id="input-type-water" class="seg-btn water active" role="tab"><i class="ti ti-droplet"></i>水費</button>
-            <button id="input-type-elec" class="seg-btn elec" role="tab"><i class="ti ti-bolt"></i>電費</button>
-          </div>
+.sync-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px 6px 9px; border-radius: 99px; font-size: 12px; font-weight: 500; border: 1px solid var(--line); background: var(--surface); transition: color .3s, background .3s; }
+.sync-badge i { font-size: 15px; }
+.sync-ok i { color: var(--green); }
+.sync-busy { color: var(--elec-ink); } .sync-busy i { animation: bob 1s var(--ease) infinite alternate; }
+.sync-err { color: var(--red); background: var(--red-soft); border-color: transparent; }
+@keyframes bob { to { transform: translateY(-2px); opacity: .5; } }
 
-          <div class="fields">
-            <div class="fg"><label for="in-site">計費項目</label><div class="select-wrap"><select id="in-site"></select><i class="ti ti-chevron-down"></i></div></div>
-            <div class="fg"><label for="in-period">期別</label><input type="month" id="in-period"></div>
-            <div class="fg" id="input-water-row"><label for="in-water">水費</label><div class="input-unit big"><span class="pre">$</span><input type="number" id="in-water" placeholder="0" min="0" inputmode="decimal"><span class="suf">元</span></div></div>
-            <div class="fg" id="input-elec-row" style="display:none"><label for="in-elec">用電度數</label><div class="input-unit big"><input type="number" id="in-elec" placeholder="0" min="0" value="0" inputmode="decimal"><span class="suf">度</span></div></div>
-          </div>
-          <button class="btn primary full lg" id="btn-add-record"><i class="ti ti-arrow-right"></i>儲存紀錄<kbd class="kbd-hint">↵</kbd></button>
-        </div>
+.theme-btn { width: 34px; height: 34px; border-radius: 99px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; display: grid; place-items: center; font-size: 17px; color: var(--ink-2); transition: transform .5s var(--ease-spring), color .2s; }
+.theme-btn:hover { color: var(--ink); transform: rotate(180deg); }
 
-        <div class="history">
-          <div class="section-head tight">
-            <h2><span class="sh-num">H</span>歷史紀錄</h2>
-            <div class="toolbar">
-              <label class="search"><i class="ti ti-search"></i><input type="search" id="hist-search" placeholder="搜尋名稱或期別"></label>
-              <label class="ctl"><select id="hist-filter"><option value="all">所有計費項目</option></select><i class="ti ti-chevron-down"></i></label>
-            </div>
-          </div>
-          <div class="table-card">
-            <table class="tbl">
-              <thead><tr><th>計費項目</th><th>期別</th><th class="num">數值</th><th class="act"></th></tr></thead>
-              <tbody id="hist-tbody"></tbody>
-            </table>
-          </div>
-          <div class="more-row"><button id="hist-more-btn" class="btn ghost" style="display:none">查看更多紀錄</button></div>
-        </div>
-      </div>
-    </section>
+/* ── Main ─────────────────────────────────────────────── */
+.main { min-width: 0; padding: 36px var(--gutter) 80px; max-width: 1360px; width: 100%; }
+.topbar { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding-bottom: 26px; margin-bottom: 30px; border-bottom: 1px solid var(--line-2); flex-wrap: wrap; }
+.eyebrow { display: flex; align-items: center; gap: 10px; font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 10px; }
+.eyebrow-rule { width: 28px; height: 1px; background: currentColor; opacity: .5; }
+.page-title { font-family: var(--f-cjk-serif); font-weight: 700; font-size: clamp(30px, 4.2vw, 52px); line-height: 1.05; letter-spacing: .02em; }
+.topbar-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.today { font-family: var(--f-mono); font-size: 12px; color: var(--ink-2); text-align: right; line-height: 1.5; }
+.today b { display: block; font-family: var(--f-serif); font-weight: 400; font-style: italic; font-size: 22px; color: var(--ink); letter-spacing: 0; }
 
-    <!-- ══════════ 保險追蹤 ══════════ -->
-    <section id="tab-insurance" class="tab">
-      <div id="ins-alerts" class="alert-list"></div>
-      <div class="panel form-card">
-        <div class="panel-row">
-          <div>
-            <h3 class="panel-title">新增保險</h3>
-            <p class="panel-sub">到期前依「預警天數」於儀表板與此頁提醒。</p>
-          </div>
-        </div>
-        <div class="fields grid cols-6">
-          <div class="fg span-2"><label for="ins-name">保險名稱</label><input type="text" id="ins-name" placeholder="例：火災險－北屯總部"></div>
-          <div class="fg"><label for="ins-vendor">保險公司</label><input type="text" id="ins-vendor" placeholder="例：新光產物"></div>
-          <div class="fg"><label for="ins-expiry">到期日</label><input type="date" id="ins-expiry"></div>
-          <div class="fg"><label for="ins-days">預警天數</label><div class="input-unit"><input type="number" id="ins-days" value="30" min="1"><span class="suf">天</span></div></div>
-          <div class="fg"><label for="ins-note">備註</label><input type="text" id="ins-note" placeholder="選填"></div>
-        </div>
-        <div class="btn-row"><button class="btn primary" id="btn-add-ins"><i class="ti ti-plus"></i>新增保險</button></div>
-      </div>
-      <div class="table-card">
-        <table class="tbl">
-          <thead><tr><th>保險項目</th><th>保險公司</th><th>到期日</th><th>剩餘</th><th>備註</th><th class="act"></th></tr></thead>
-          <tbody id="ins-tbody"></tbody>
-        </table>
-      </div>
-    </section>
+/* Tabs + 入場動效 */
+.tab { display: none; }
+.tab.active { display: block; }
+.tab.active > * { animation: rise .7s var(--ease) both; }
+.tab.active > *:nth-child(2) { animation-delay: .05s; }
+.tab.active > *:nth-child(3) { animation-delay: .1s; }
+.tab.active > *:nth-child(4) { animation-delay: .15s; }
+.tab.active > *:nth-child(5) { animation-delay: .2s; }
+.tab.active > *:nth-child(n+6) { animation-delay: .25s; }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 
-    <!-- ══════════ 廠區管理 ══════════ -->
-    <section id="tab-sites" class="tab">
-      <div class="panel form-card">
-        <h3 class="panel-title">新增計費項目</h3>
-        <p class="panel-sub">名稱會自動組成 <code>【水】廠區 編號</code> 的格式。</p>
-        <div class="fields grid">
-          <div class="fg"><label for="new-site-type">類型</label><div class="select-wrap"><select id="new-site-type"><option value="water">【水】水費</option><option value="elec">【電】電費</option></select><i class="ti ti-chevron-down"></i></div></div>
-          <div class="fg"><label for="new-site-loc">廠區名稱</label><input type="text" id="new-site-loc" placeholder="例：北屯總部"></div>
-          <div class="fg"><label for="new-site-label">編號或說明 <em>選填</em></label><input type="text" id="new-site-label" placeholder="例：K、1F、010"></div>
-          <div class="fg"><label for="new-site-cycle">計費週期</label><div class="select-wrap"><select id="new-site-cycle"><option value="2">兩個月一期</option><option value="1">每月一期</option></select><i class="ti ti-chevron-down"></i></div></div>
-        </div>
-        <div class="btn-row"><span class="name-preview" id="site-preview"></span><button class="btn primary" id="btn-add-site"><i class="ti ti-plus"></i>新增</button></div>
-      </div>
-      <div class="table-card">
-        <table class="tbl">
-          <thead><tr><th>計費項目</th><th>類型</th><th>計費週期</th><th class="num">資料筆數</th><th class="act"></th></tr></thead>
-          <tbody id="sites-tbody"></tbody>
-        </table>
-      </div>
-    </section>
+/* ── Controls ─────────────────────────────────────────── */
+.dash-intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px 40px; margin-bottom: 28px; flex-wrap: wrap; }
+.lede { font-size: clamp(17px, 1.6vw, 21px); line-height: 1.65; color: var(--ink-2); max-width: 46ch; text-wrap: pretty; }
+.lede strong { color: var(--ink); font-weight: 600; }
+.lede .hl-elec { color: var(--elec-ink); font-weight: 600; }
+.lede .hl-water { color: var(--water-ink); font-weight: 600; }
+.lede .hl-red { color: var(--red); font-weight: 600; }
+.controls { display: flex; gap: 8px; flex-wrap: wrap; }
+.ctl { position: relative; display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 32px 0 14px; border-radius: 99px; border: 1px solid var(--line-2); background: var(--surface); cursor: pointer; transition: border-color .2s, box-shadow .2s; }
+.ctl:hover { border-color: var(--ink-3); }
+.ctl:focus-within { border-color: var(--water); box-shadow: var(--ring); }
+.ctl > span { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+.ctl select { appearance: none; -webkit-appearance: none; border: 0; background: transparent; outline: none; font-size: 13px; font-weight: 600; cursor: pointer; padding-right: 2px; max-width: 160px; }
+.ctl > i, .select-wrap > i { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 14px; color: var(--ink-3); }
 
-    <!-- ══════════ 匯入/匯出 ══════════ -->
-    <section id="tab-io" class="tab">
-      <div class="io-grid">
-        <div class="panel">
-          <span class="step">Step 1</span>
-          <h3 class="panel-title">下載匯入範本</h3>
-          <p class="panel-sub">同仁依範本欄位填寫後，再於右側上傳匯入。</p>
-          <ul class="tpl-list">
-            <li class="tpl-row"><span class="tpl-icon elec"><i class="ti ti-bolt"></i></span><div class="tpl-text"><b>水電紀錄範本</b><span>計費項目、期別、數值</span></div><button class="btn subtle" data-tpl="utility"><i class="ti ti-download"></i>.xlsx</button></li>
-            <li class="tpl-row"><span class="tpl-icon ins"><i class="ti ti-shield"></i></span><div class="tpl-text"><b>保險清單範本</b><span>保險名稱、公司、到期日</span></div><button class="btn subtle" data-tpl="insurance"><i class="ti ti-download"></i>.xlsx</button></li>
-            <li class="tpl-row"><span class="tpl-icon water"><i class="ti ti-building"></i></span><div class="tpl-text"><b>計費項目範本</b><span>含【水】【電】前綴格式</span></div><button class="btn subtle" data-tpl="sites"><i class="ti ti-download"></i>.xlsx</button></li>
-          </ul>
-        </div>
-        <div class="panel">
-          <span class="step">Step 2</span>
-          <h3 class="panel-title">匯入 Excel 資料</h3>
-          <p class="panel-sub">選擇資料類型，再上傳 .xlsx 檔案。</p>
-          <div class="fg"><label for="import-type">資料類型</label><div class="select-wrap"><select id="import-type"><option value="utility">水電紀錄</option><option value="insurance">保險清單</option><option value="sites">計費項目</option></select><i class="ti ti-chevron-down"></i></div></div>
-          <label class="drop-zone" for="file-input">
-            <span class="dz-icon"><i class="ti ti-file-spreadsheet"></i></span>
-            <span class="dz-title">點擊選擇，或拖曳 Excel 檔案至此</span>
-            <span class="dz-hint">支援 .xlsx / .xls</span>
-            <input type="file" id="file-input" accept=".xlsx,.xls">
-          </label>
-        </div>
-      </div>
+/* ── Alerts ─────────────────────────────────────────────── */
+.alert-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+.alert-list:empty { display: none; }
+.alert-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px 12px 16px; border-radius: var(--r); font-size: 13.5px; position: relative; overflow: hidden; background: var(--surface); border: 1px solid var(--line); }
+.alert-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+.alert-item.danger::before { background: var(--red); }
+.alert-item.warning::before { background: var(--elec); }
+.alert-item i { font-size: 18px; flex-shrink: 0; }
+.alert-item.danger i { color: var(--red); }
+.alert-item.warning i { color: var(--elec-ink); }
+.a-text { flex: 1; min-width: 0; }
+.a-text small { color: var(--ink-3); margin-left: 6px; }
+.a-days { font-family: var(--f-mono); font-size: 11.5px; font-weight: 500; padding: 3px 9px; border-radius: 99px; white-space: nowrap; }
+.danger .a-days { background: var(--red-soft); color: var(--red); }
+.warning .a-days { background: var(--elec-soft); color: var(--elec-ink); }
 
-      <div class="section-head">
-        <h2><span class="sh-num">E</span>匯出現有資料</h2>
-        <span class="section-note">下載目前資料庫內容</span>
-      </div>
-      <div class="export-grid">
-        <div class="panel export-card"><i class="ti ti-bolt ec-icon elec"></i><b>水電紀錄</b><span id="export-util-count">—</span><button class="btn primary full" data-export="utility"><i class="ti ti-download"></i>匯出 Excel</button></div>
-        <div class="panel export-card"><i class="ti ti-shield ec-icon ins"></i><b>保險清單</b><span id="export-ins-count">—</span><button class="btn primary full" data-export="insurance"><i class="ti ti-download"></i>匯出 Excel</button></div>
-        <div class="panel export-card"><i class="ti ti-database ec-icon water"></i><b>完整備份</b><span>所有資料（JSON）</span><button class="btn full" id="btn-export-json"><i class="ti ti-download"></i>匯出 JSON</button></div>
-      </div>
+/* ── KPI ─────────────────────────────────────────────── */
+.kpi-grid { display: grid; grid-template-columns: 1.35fr 1.35fr 1fr 1fr; gap: 14px; margin-bottom: 56px; }
+.kpi {
+  position: relative; overflow: hidden; min-height: 212px;
+  display: flex; flex-direction: column; padding: 20px 22px 18px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1); transition: transform .5s var(--ease), box-shadow .5s var(--ease);
+}
+.kpi:hover { transform: translateY(-3px); box-shadow: var(--shadow-2); }
+.kpi-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.kpi-label { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 500; color: var(--ink-2); }
+.kpi-label i { font-size: 16px; }
+.kpi-unit { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.kpi-value { margin-top: auto; font-family: var(--f-serif); font-size: clamp(40px, 4.4vw, 64px); line-height: .95; letter-spacing: -.01em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.kpi-value .cur { font-size: .55em; vertical-align: .55em; margin-right: 2px; color: var(--ink-3); }
+.kpi-foot { margin-top: 10px; font-size: 12px; color: var(--ink-3); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.kpi-foot b { color: var(--ink-2); font-weight: 600; }
+.kpi .spark { position: absolute; right: 18px; top: 50px; width: 52%; height: 54px; opacity: .9; }
+.kpi .spark path.area { opacity: .16; }
+.kpi .spark path.ln { fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: var(--len, 600); stroke-dashoffset: var(--len, 600); animation: draw 1.6s .2s var(--ease) forwards; }
+.kpi .spark circle { animation: pop .4s 1.5s var(--ease-spring) both; transform-box: fill-box; transform-origin: center; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes pop { from { transform: scale(0); } }
+.kpi.elec .kpi-label i { color: var(--elec-ink); }
+.kpi.elec .spark { color: var(--elec); }
+.kpi.water .kpi-label i { color: var(--water); }
+.kpi.water .spark { color: var(--water); }
+.kpi.alert { background: var(--ink); color: var(--on-ink); border-color: transparent; }
+.kpi.alert .kpi-label, .kpi.alert .kpi-foot, .kpi.alert .kpi-foot b { color: color-mix(in srgb, var(--on-ink) 70%, transparent); }
+.kpi.alert .kpi-unit { color: color-mix(in srgb, var(--on-ink) 50%, transparent); }
+.kpi.alert .kpi-label i { color: var(--red); }
+.kpi.alert .kpi-value { color: var(--on-ink); }
+.kpi.alert::after { content: ''; position: absolute; right: -40px; bottom: -40px; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--red) 55%, transparent), transparent 70%); animation: breathe 3.2s ease-in-out infinite; }
+.kpi.ok .kpi-label i { color: var(--green); }
+@keyframes breathe { 50% { transform: scale(1.25); opacity: .6; } }
+.split-bar { display: flex; height: 6px; border-radius: 99px; overflow: hidden; gap: 2px; margin-top: 12px; }
+.split-bar span { display: block; border-radius: 99px; transform-origin: left; animation: grow 1s .3s var(--ease) both; }
+.split-bar .w { background: var(--water); } .split-bar .e { background: var(--elec); }
+@keyframes grow { from { transform: scaleX(0); } }
+.skeleton { background: linear-gradient(100deg, var(--surface) 30%, var(--surface-2) 50%, var(--surface) 70%) 0 0 / 300% 100%; animation: shimmer 1.4s linear infinite !important; }
+@keyframes shimmer { to { background-position: -150% 0; } }
 
-      <div class="danger-zone">
-        <div class="dzn-text">
-          <h3><i class="ti ti-alert-triangle"></i>還原完整備份</h3>
-          <p>匯入 JSON 備份會<strong>完整覆蓋</strong>資料庫內的所有資料，無法復原。</p>
-        </div>
-        <label class="drop-zone sm" for="json-input">
-          <input type="file" id="json-input" accept=".json">
-          <i class="ti ti-file-import"></i><span>選擇 JSON 備份檔案</span>
-        </label>
-      </div>
-    </section>
+/* ── Section head ─────────────────────────────────────── */
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px 24px; margin: 0 0 18px; flex-wrap: wrap; }
+.section-head.tight { margin-bottom: 14px; align-items: center; }
+.section-head h2 { display: flex; align-items: baseline; gap: 12px; font-family: var(--f-cjk-serif); font-size: clamp(20px, 2vw, 26px); font-weight: 700; letter-spacing: .02em; }
+.sh-num { font-family: var(--f-serif); font-style: italic; font-weight: 400; font-size: 1.15em; color: var(--ink-3); }
+.section-note { font-size: 12px; color: var(--ink-3); }
+.legend-inline { display: flex; gap: 16px; font-size: 12px; color: var(--ink-2); }
+.lg { display: inline-flex; align-items: center; gap: 6px; }
+.lg::before { content: ''; width: 8px; height: 8px; border-radius: 50%; }
+.lg.water::before { background: var(--water); } .lg.elec::before { background: var(--elec); }
+.lg.anomaly::before { background: transparent; border: 1.5px solid var(--red); width: 7px; height: 7px; }
 
-    <footer class="foot">蒙恩聽障烘焙坊股份有限公司 · 水電 &amp; 保險管理平台 <span>v4</span></footer>
-  </main>
-</div>
+/* ── Location cards ───────────────────────────────────── */
+.loc-grid { columns: 3 300px; column-gap: 14px; margin-bottom: 56px; }
+.loc-grid > * { break-inside: avoid; margin-bottom: 14px; }
+.loc-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-1); padding: 18px 18px 14px; transition: transform .5s var(--ease), box-shadow .5s var(--ease), border-color .3s; animation: rise .6s var(--ease) both; animation-delay: calc(var(--i, 0) * 45ms); }
+.loc-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-2); border-color: var(--line-2); }
+.loc-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.loc-name { font-size: 16px; font-weight: 700; letter-spacing: .02em; }
+.loc-meta { font-family: var(--f-mono); font-size: 11px; color: var(--ink-3); }
+.loc-meta .warn { color: var(--red); }
+.meters { display: flex; flex-direction: column; }
+.meter { display: grid; grid-template-columns: 8px minmax(0,1fr) auto auto; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px dashed var(--line-2); font-size: 13px; }
+.meter:first-child { border-top: 0; }
+.m-dot { width: 8px; height: 8px; border-radius: 50%; }
+.meter.water .m-dot { background: var(--water); } .meter.elec .m-dot { background: var(--elec); }
+.m-name { min-width: 0; display: flex; flex-direction: column; line-height: 1.3; }
+.m-name b { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m-name span { font-family: var(--f-mono); font-size: 10.5px; color: var(--ink-3); }
+.m-delta { font-family: var(--f-mono); font-size: 11px; color: var(--ink-3); white-space: nowrap; }
+.m-delta.hot { color: var(--red); background: var(--red-soft); padding: 2px 7px; border-radius: 99px; }
+.m-val { font-family: var(--f-mono); font-weight: 500; font-size: 13px; font-variant-numeric: tabular-nums; text-align: right; min-width: 72px; }
+.meter.water .m-val { color: var(--water-ink); } .meter.elec .m-val { color: var(--elec-ink); }
+.meter.anomaly .m-dot { box-shadow: 0 0 0 3px var(--surface), 0 0 0 4.5px var(--red); animation: ping 2s var(--ease) infinite; }
+@keyframes ping { 50% { box-shadow: 0 0 0 3px var(--surface), 0 0 0 7px transparent; } }
+.loc-empty { font-size: 12.5px; color: var(--ink-3); padding: 6px 0; }
 
-<!-- 未填提醒浮窗 -->
-<aside class="unfilled-float" id="unfilled-float" style="display:none" aria-label="本期待填">
-  <button class="unfilled-header" onclick="toggleUnfilled()" aria-expanded="true" id="unfilled-toggle">
-    <span class="unfilled-dot" id="unfilled-dot"></span>
-    <span id="unfilled-title">本期待填項目</span>
-    <i class="ti ti-chevron-down" id="unfilled-chevron"></i>
-  </button>
-  <div class="unfilled-list" id="unfilled-list"></div>
-</aside>
+/* ── Cards / charts ───────────────────────────────────── */
+.card, .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-1); }
+.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.chart-card { padding: 20px 22px 16px; }
+.card-head { margin-bottom: 14px; }
+.card-kicker { display: inline-flex; align-items: center; gap: 6px; font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); }
+.chart-card.elec .card-kicker i { color: var(--elec-ink); }
+.chart-card.water .card-kicker i { color: var(--water); }
+.card-head h3 { font-size: 17px; font-weight: 700; margin-top: 4px; }
+.card-head h3 small { font-size: 12px; font-weight: 500; color: var(--ink-3); margin-left: 4px; }
+.chart-wrap { position: relative; height: 280px; }
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="config.js?v=5"></script>
-<script src="app.js?v=5"></script>
-</body>
-</html>
+/* ── Panels & forms ───────────────────────────────────── */
+.panel { padding: 24px; }
+.form-card { margin-bottom: 20px; }
+.panel-title { font-size: 18px; font-weight: 700; letter-spacing: .01em; }
+.panel-sub { font-size: 13px; color: var(--ink-2); margin: 4px 0 20px; }
+.split { display: grid; grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); gap: 28px; align-items: start; }
+.split > * { min-width: 0; }
+.sticky { position: sticky; top: 24px; }
+
+.fields { display: flex; flex-direction: column; gap: 16px; margin-bottom: 22px; }
+.fields.grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; }
+.fields.grid.cols-6 { grid-template-columns: repeat(6, minmax(0,1fr)); }
+.span-2 { grid-column: span 2; }
+.fg { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.fg label { font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.fg label em { font-style: normal; font-weight: 400; color: var(--ink-3); margin-left: 4px; }
+.fg input, .fg select, .select-wrap select {
+  width: 100%; height: 44px; padding: 0 14px; border-radius: var(--r);
+  border: 1px solid var(--line-2); background: var(--bg); outline: none;
+  font-size: 14px; transition: border-color .2s, box-shadow .2s, background .2s;
+}
+.fg input:hover, .select-wrap select:hover { border-color: var(--ink-3); }
+.fg input:focus, .select-wrap select:focus { border-color: var(--water); box-shadow: var(--ring); background: var(--surface); }
+.fg input::placeholder { color: var(--ink-3); }
+.select-wrap { position: relative; }
+.select-wrap select { appearance: none; -webkit-appearance: none; padding-right: 36px; cursor: pointer; }
+.input-unit { position: relative; display: flex; align-items: center; }
+.input-unit input { padding-right: 40px; }
+.input-unit .pre { position: absolute; left: 14px; color: var(--ink-3); pointer-events: none; }
+.input-unit .pre + input { padding-left: 30px; }
+.input-unit .suf { position: absolute; right: 14px; font-size: 13px; color: var(--ink-3); pointer-events: none; }
+.input-unit.big input { height: 64px; font-family: var(--f-serif); font-size: 34px; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.input-unit.big .pre { font-family: var(--f-serif); font-size: 24px; }
+.input-unit.big .pre + input { padding-left: 34px; }
+input[type=number]::-webkit-inner-spin-button { opacity: 0; }
+
+/* Segmented control */
+.seg { position: relative; display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border-radius: 99px; background: var(--bg); border: 1px solid var(--line); margin-bottom: 22px; }
+.seg-ind { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 99px; background: var(--water); box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--water) 70%, transparent); transition: transform .5s var(--ease-spring), background .3s, box-shadow .3s; }
+.seg[data-mode="elec"] .seg-ind { transform: translateX(100%); background: var(--elec); box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--elec) 80%, transparent); }
+.seg-btn { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 40px; border: 0; background: transparent; cursor: pointer; font-weight: 600; color: var(--ink-2); border-radius: 99px; transition: color .3s; }
+.seg-btn i { font-size: 17px; }
+.seg-btn.water.active { color: #fff; }
+.seg-btn.elec.active { color: #17160F; }
+
+/* Buttons */
+.btn {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 40px; padding: 0 18px; border-radius: 99px; border: 1px solid var(--line-2);
+  background: var(--surface); cursor: pointer; font-size: 13.5px; font-weight: 600; white-space: nowrap;
+  transition: transform .25s var(--ease-spring), background .2s, border-color .2s, box-shadow .25s, color .2s;
+}
+.btn i { font-size: 16px; transition: transform .35s var(--ease-spring); }
+.btn:hover { border-color: var(--ink-3); }
+.btn:hover i.ti-arrow-right { transform: translateX(2px); }
+.btn:hover i.ti-download { transform: translateY(2px); }
+.btn:hover i.ti-plus { transform: rotate(90deg); }
+.btn:active { transform: scale(.97); }
+.btn:disabled { opacity: .45; cursor: progress; transform: none; }
+.btn.primary { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+.btn.primary:hover { box-shadow: 0 10px 24px -10px color-mix(in srgb, var(--ink) 70%, transparent); }
+.btn.subtle { height: 34px; padding: 0 13px; font-size: 12.5px; background: var(--bg); border-color: var(--line); }
+.btn.subtle:hover { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+.btn.ghost { background: transparent; }
+.btn.full { width: 100%; }
+.btn.lg { height: 52px; font-size: 15px; }
+.btn.is-loading { color: transparent !important; }
+.btn.is-loading::after { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--on-ink); border-right-color: transparent; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.kbd-hint { margin-left: 4px; opacity: .5; border: 1px solid currentColor; border-radius: 4px; padding: 0 5px; line-height: 16px; }
+.btn-row { display: flex; gap: 10px; align-items: center; justify-content: flex-end; flex-wrap: wrap; }
+.name-preview { margin-right: auto; font-family: var(--f-mono); font-size: 12.5px; color: var(--ink-2); }
+.name-preview:empty { display: none; }
+.name-preview::before { content: '預覽 → '; color: var(--ink-3); }
+
+.icon-btn { width: 32px; height: 32px; border-radius: 99px; border: 1px solid transparent; background: transparent; cursor: pointer; display: inline-grid; place-items: center; color: var(--ink-3); font-size: 16px; transition: all .2s var(--ease); }
+.icon-btn:hover { color: var(--red); background: var(--red-soft); }
+.icon-btn:active { transform: scale(.9); }
+
+/* ── Tables ───────────────────────────────────────────── */
+.table-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-1); overflow-x: auto; margin-bottom: 16px; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 560px; }
+.tbl thead th { position: sticky; top: 0; padding: 14px 16px 12px; font-family: var(--f-mono); font-size: 10.5px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); text-align: left; border-bottom: 1px solid var(--line-2); background: var(--surface); white-space: nowrap; }
+.tbl td { padding: 13px 16px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.tbl tbody tr { transition: background .15s; }
+.tbl tbody tr:last-child td { border-bottom: 0; }
+.tbl tbody tr:hover td { background: var(--surface-2); }
+.tbl .num { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.tbl .act { width: 52px; text-align: right; }
+.tbl .mono { font-family: var(--f-mono); font-size: 12.5px; color: var(--ink-2); }
+.tbl .muted { color: var(--ink-2); }
+.tbl .strong { font-weight: 600; }
+.tbl tr.row-new td { animation: flash 1.6s var(--ease); }
+@keyframes flash { 0%, 30% { background: var(--elec-soft); } }
+.tbl tr.removing td { opacity: 0; transition: opacity .3s; }
+.cell-name { display: flex; align-items: center; gap: 10px; }
+.group-row td { background: var(--surface-2); padding: 10px 16px; font-weight: 700; font-size: 13px; }
+.group-row td span { font-family: var(--f-mono); font-weight: 400; font-size: 11px; color: var(--ink-3); margin-left: 8px; }
+.indent { padding-left: 34px !important; }
+
+.type-badge { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.type-badge.water { background: var(--water-soft); color: var(--water-ink); }
+.type-badge.elec { background: var(--elec-soft); color: var(--elec-ink); }
+
+.pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.pill.monthly { background: var(--water-soft); color: var(--water-ink); }
+.pill.bimonthly { background: var(--surface-2); color: var(--ink-2); border: 1px solid var(--line); }
+.pill.danger { background: var(--red-soft); color: var(--red); }
+.pill.warning { background: var(--elec-soft); color: var(--elec-ink); }
+.pill.ok { background: var(--green-soft); color: var(--green); }
+#top-badge.pill { height: 34px; padding: 0 14px; font-size: 12.5px; cursor: pointer; border: 0; }
+#top-badge.pill i { animation: ring 2.4s ease-in-out infinite; transform-origin: 50% 0; }
+@keyframes ring { 0%, 60%, 100% { transform: rotate(0); } 65% { transform: rotate(14deg); } 72% { transform: rotate(-12deg); } 79% { transform: rotate(8deg); } 86% { transform: rotate(-4deg); } }
+
+.life { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 96px; }
+.life-bar { width: 100%; max-width: 120px; height: 4px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.life-bar span { display: block; height: 100%; border-radius: inherit; transform-origin: left; animation: grow .9s var(--ease) both; }
+.life.ok .life-bar span { background: var(--green); }
+.life.warning .life-bar span { background: var(--elec); }
+.life.danger .life-bar span { background: var(--red); }
+
+.empty-state { padding: 56px 20px; text-align: center; color: var(--ink-3); }
+.empty-state i { font-size: 30px; display: block; margin-bottom: 10px; }
+.empty-state b { display: block; color: var(--ink-2); font-size: 14px; margin-bottom: 4px; }
+.more-row { text-align: center; }
+
+/* ── Toast ─────────────────────────────────────────────── */
+.toast {
+  position: fixed; left: 50%; bottom: 28px; z-index: 999;
+  display: flex; align-items: center; gap: 10px; max-width: min(92vw, 480px);
+  padding: 12px 18px 12px 14px; border-radius: 99px;
+  background: #17160F; color: #FBFAF6; font-size: 13.5px; font-weight: 500;
+  box-shadow: 0 20px 40px -12px rgba(0,0,0,.45);
+  opacity: 0; transform: translate(-50%, 20px) scale(.96); pointer-events: none;
+  transition: opacity .3s var(--ease), transform .45s var(--ease-spring);
+}
+:root[data-theme="dark"] .toast { background: #F0ECE0; color: #17160F; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .toast { background: #F0ECE0; color: #17160F; } }
+.toast.show { opacity: 1; transform: translate(-50%, 0) scale(1); pointer-events: auto; }
+.toast i { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 14px; flex-shrink: 0; }
+.toast.success i { background: var(--green); color: #fff; }
+.toast.error i { background: var(--red); color: #fff; }
+
+/* ── Unfilled float ───────────────────────────────────── */
+.unfilled-float {
+  position: fixed; right: 24px; bottom: 24px; z-index: 90; width: 300px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4); backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid var(--line-2); border-radius: var(--r-lg); box-shadow: var(--shadow-2);
+  overflow: hidden; animation: dock .7s .4s var(--ease-spring) both;
+}
+@keyframes dock { from { opacity: 0; transform: translateY(24px) scale(.96); } }
+.unfilled-header { width: 100%; display: flex; align-items: center; gap: 10px; padding: 13px 16px; border: 0; background: transparent; cursor: pointer; font-size: 13px; font-weight: 600; text-align: left; }
+.unfilled-header #unfilled-title { flex: 1; }
+.unfilled-header i { font-size: 15px; color: var(--ink-3); transition: transform .35s var(--ease); }
+.unfilled-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); animation: pulse-dot 1.8s ease-out infinite; }
+@keyframes pulse-dot { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--red) 50%, transparent); } 80%, 100% { box-shadow: 0 0 0 8px transparent; } }
+.unfilled-float:not(.open) .unfilled-list { display: none; }
+.unfilled-float:not(.open) { width: auto !important; border-radius: 99px; }
+.unfilled-float:not(.open) .unfilled-header { padding: 11px 16px; }
+.unfilled-list { max-height: 240px; overflow-y: auto; border-top: 1px solid var(--line); overscroll-behavior: contain; }
+.unfilled-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 16px; font-size: 12.5px; color: var(--ink-2); border: 0; border-bottom: 1px solid var(--line); background: transparent; cursor: pointer; text-align: left; transition: background .15s, color .15s, padding .25s var(--ease); }
+.unfilled-item:last-child { border-bottom: 0; }
+.unfilled-item:hover { background: var(--surface-2); color: var(--ink); padding-left: 20px; }
+.unfilled-item .m-dot { flex-shrink: 0; }
+.unfilled-item.water .m-dot { background: var(--water); } .unfilled-item.elec .m-dot { background: var(--elec); }
+.unfilled-item .u-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.unfilled-period { font-family: var(--f-mono); font-size: 11px; color: var(--ink-3); }
+.unfilled-item .ti-arrow-right { font-size: 13px; opacity: 0; transform: translateX(-4px); transition: all .2s; }
+.unfilled-item:hover .ti-arrow-right { opacity: 1; transform: none; }
+
+/* ── IO ─────────────────────────────────────────────── */
+.io-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 56px; }
+.step { display: inline-block; font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; }
+.tpl-list { list-style: none; }
+.tpl-row { display: flex; align-items: center; gap: 14px; padding: 13px 0; border-top: 1px solid var(--line); }
+.tpl-icon, .ec-icon { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; font-size: 18px; flex-shrink: 0; }
+.tpl-icon.elec, .ec-icon.elec { background: var(--elec-soft); color: var(--elec-ink); }
+.tpl-icon.water, .ec-icon.water { background: var(--water-soft); color: var(--water-ink); }
+.tpl-icon.ins, .ec-icon.ins { background: var(--green-soft); color: var(--green); }
+.tpl-text { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.tpl-text b { font-size: 14px; font-weight: 600; }
+.tpl-text span { font-size: 12px; color: var(--ink-3); }
+.drop-zone { margin-top: 16px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 30px 20px; border-radius: var(--r); border: 1.5px dashed var(--line-2); background: var(--bg); cursor: pointer; text-align: center; transition: border-color .25s, background .25s, transform .35s var(--ease-spring); }
+.drop-zone input[type=file] { display: none; }
+.dz-icon { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); border: 1px solid var(--line); font-size: 24px; color: var(--ink-2); margin-bottom: 6px; transition: transform .45s var(--ease-spring), background .25s, color .25s; }
+.dz-title { font-weight: 600; font-size: 14px; }
+.dz-hint { font-size: 12px; color: var(--ink-3); }
+.drop-zone:hover, .drop-zone.drag { border-color: var(--water); background: var(--water-soft); }
+.drop-zone:hover .dz-icon, .drop-zone.drag .dz-icon { transform: translateY(-4px); background: var(--water); color: #fff; border-color: transparent; }
+.drop-zone.drag { transform: scale(1.015); }
+.export-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 40px; }
+.export-card { display: flex; flex-direction: column; gap: 4px; transition: transform .5s var(--ease), box-shadow .5s var(--ease); }
+.export-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-2); }
+.export-card .ec-icon { margin-bottom: 14px; }
+.export-card b { font-size: 16px; }
+.export-card > span { font-size: 12.5px; color: var(--ink-3); font-family: var(--f-mono); margin-bottom: 18px; }
+.export-card .btn { margin-top: auto; }
+.danger-zone { display: grid; grid-template-columns: 1fr minmax(240px, 340px); align-items: center; gap: 20px 32px; padding: 22px 24px; border-radius: var(--r-lg); border: 1px solid color-mix(in srgb, var(--red) 30%, transparent); background: color-mix(in srgb, var(--red-soft) 50%, transparent); }
+.danger-zone h3 { display: flex; align-items: center; gap: 8px; font-size: 16px; margin-bottom: 4px; }
+.danger-zone h3 i { color: var(--red); }
+.danger-zone p { font-size: 13px; color: var(--ink-2); }
+.danger-zone strong { color: var(--red); }
+.drop-zone.sm { margin: 0; flex-direction: row; justify-content: center; gap: 8px; padding: 16px; background: var(--surface); font-weight: 600; font-size: 13.5px; }
+.drop-zone.sm i { font-size: 18px; }
+.drop-zone.sm:hover { border-color: var(--red); background: var(--surface); color: var(--red); }
+
+.foot { margin-top: 72px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; color: var(--ink-3); display: flex; justify-content: space-between; gap: 12px; }
+.foot span { font-family: var(--f-mono); }
+
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; }
+.search { position: relative; display: inline-flex; align-items: center; }
+.search i { position: absolute; left: 13px; font-size: 15px; color: var(--ink-3); pointer-events: none; }
+.search input { height: 38px; width: 220px; max-width: 100%; padding: 0 14px 0 36px; border-radius: 99px; border: 1px solid var(--line-2); background: var(--surface); outline: none; font-size: 13px; transition: border-color .2s, box-shadow .2s, width .4s var(--ease); }
+.search input:focus { border-color: var(--water); box-shadow: var(--ring); width: 260px; }
+
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 1240px) {
+  .kpi-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .fields.grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .fields.grid.cols-6 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+}
+@media (max-width: 1080px) {
+  .split { grid-template-columns: 1fr; }
+  .sticky { position: static; }
+  .charts-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 900px) {
+  :root { --rail-w: 0px; }
+  .shell { display: block; }
+  .rail {
+    position: sticky; top: 0; z-index: 50; height: auto; flex-direction: row; align-items: center; gap: 12px;
+    padding: 12px 16px; padding-top: max(12px, env(safe-area-inset-top));
+    /* 不可用 backdrop-filter：會讓內部 position:fixed 的導覽列以 rail 為定位基準 */
+    background: color-mix(in srgb, var(--bg) 96%, transparent);
+    border-right: 0; border-bottom: 1px solid var(--line);
+  }
+  .brand { padding: 0; }
+  .brand-mark { width: 32px; height: 32px; }
+  .brand-text strong { font-size: 16px; }
+  .rail-org { display: none; }
+  .rail-foot { margin-left: auto; margin-top: 0; padding: 0; }
+  .nav {
+    position: fixed; z-index: 60; left: 12px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom));
+    flex-direction: row; justify-content: space-between; gap: 2px; padding: 6px;
+    border-radius: 22px; background: color-mix(in srgb, var(--surface) 86%, transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(1.5); backdrop-filter: blur(18px) saturate(1.5);
+    border: 1px solid var(--line-2); box-shadow: var(--shadow-2);
+  }
+  .nav-btn { flex: 1; display: flex; flex-direction: column; gap: 2px; padding: 8px 2px 6px; border-radius: 16px; font-size: 10.5px; text-align: center; }
+  .nav-btn i { font-size: 20px; }
+  .nav-btn:hover i { transform: none; }
+  .nav-idx, .nav-btn kbd { display: none; }
+  .main { padding: 24px 16px calc(110px + env(safe-area-inset-bottom)); }
+  .topbar { margin-bottom: 22px; padding-bottom: 20px; }
+  .unfilled-float { right: 12px; left: auto; bottom: calc(92px + env(safe-area-inset-bottom)); width: min(300px, calc(100vw - 24px)); }
+  .toast { bottom: calc(96px + env(safe-area-inset-bottom)); }
+  .kbd-hint { display: none; }
+}
+@media (max-width: 640px) {
+  body { font-size: 14.5px; }
+  .brand-text span { display: none; }
+  .sync-badge span { display: none; }
+  .sync-badge { padding: 0; width: 34px; height: 34px; justify-content: center; }
+  .topbar { align-items: flex-start; }
+  .today { text-align: left; }
+  .today b { font-size: 18px; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 40px; }
+  .kpi { min-height: 150px; padding: 16px; }
+  .kpi.elec, .kpi.water { grid-column: span 2; }
+  .kpi-value { font-size: 42px; }
+  .kpi .spark { width: 50%; top: 46px; height: 56px; }
+  .loc-grid { columns: 1; margin-bottom: 40px; }
+  .io-grid, .export-grid, .danger-zone { grid-template-columns: 1fr; }
+  .fields.grid, .fields.grid.cols-6 { grid-template-columns: 1fr; }
+  .span-2 { grid-column: auto; }
+  .panel { padding: 20px 18px; }
+  .chart-wrap { height: 240px; }
+  .ctl select { max-width: 120px; }
+  .toolbar { width: 100%; }
+  .toolbar .search { flex: 1; }
+  .search input, .search input:focus { width: 100%; }
+  .foot { flex-direction: column; margin-bottom: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .kpi .spark path.ln { stroke-dashoffset: 0; }
+}
